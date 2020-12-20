@@ -1,0 +1,47 @@
+* {
+  box-sizing: border-box;
+  /* color: #666; */
+  font-size: 14px;
+}
+body {
+  font-family: "SF Pro Display",Roboto,Noto,Arial,"PingFang SC","Hiragino Sans GB","Microsoft YaHei",sans-serif;
+}
+body,
+h1,
+h2,
+h3,
+h4,
+h5,
+h6,
+blockquote,
+ol,
+ul,
+dl,
+dd,
+p,
+textarea,
+input,
+select,
+option,
+form,
+button {
+  margin: 0;
+  padding: 0;
+}
+li {
+  list-style: none;
+}
+a {
+  text-decoration: none;
+  color: #000;
+}
+.clearfix {
+  clear: both;
+}
+.clearfix::before, .clearfix::after {
+  content: '.';
+  height: 0;
+  visibility: hidden;
+  display: block;
+  clear: both;
+}
