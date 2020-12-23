@@ -169,7 +169,7 @@ export default {
     this.getRankList()
     this.getCateList()
     // 添加页面滚动事件，检测页面触底，加载数据
-    window.addEventListener('scroll', this.scroll.bind(this))
+    document.addEventListener('scroll', this.scroll.bind(this))
   },
   methods: {
     // 重置请求参数
@@ -209,6 +209,8 @@ export default {
     },
 
     scroll() {
+      // 只有当页面时主页时，才检测滚动刷新
+      if (this.$route.path != '/index') return
       //页面滚动高度
       let scroll = window.pageYOffset || document.documentElement.scrollTop || document.body.scrollTop
       //窗口显示区高度

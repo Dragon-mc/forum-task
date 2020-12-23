@@ -12,8 +12,8 @@
           <div class="indicator" :style="{transform: `translateX(${indicatorIndex*70}px)`, width: indicatorWidth*hasIndicator+'px'}"></div>
         </ul>
         <div class="search_wrap">
-          <el-input placeholder="请输入搜索内容" v-model="searchInput" class="search_input" size="small"></el-input>
-          <el-button icon="el-icon-search" type="primary" @click="search" size="mini" class="search_btn"></el-button>
+          <el-input placeholder="请输入搜索内容" v-model="searchInput" class="search_input" size="small" @keyup.native.enter="handldSearch"></el-input>
+          <el-button icon="el-icon-search" type="primary" @click="handldSearch" size="mini" class="search_btn"></el-button>
         </div>
         <a href="javascript:;" @click="handleEdit"><el-button type="primary" size="mini" icon="el-icon-edit" round class="hidden-xs-only">发帖</el-button></a>
         <div class="right_wrap">
@@ -71,7 +71,8 @@ export default {
   },
   methods: {
     // 点击搜索按钮，搜索内容
-    search () {
+    handldSearch () {
+      if (this.searchInput.trim() == '') return
       let route = this.$router.resolve({
         path: '/search',
         query: {keywords: this.searchInput}
@@ -124,7 +125,10 @@ export default {
         type: 'success'
       })
       this.login = isLogin()
-      this.$router.replace('/index')
+      if (this.$route.path != '/index') {
+        this.$router.replace('/index')
+      }
+      
     }
 
   }

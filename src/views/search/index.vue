@@ -73,7 +73,7 @@ export default {
   filters: {
     emphasizeKeywords (val, queryKeyWords) {
       let nowKeywords = queryKeyWords
-      // return val.replace(nowKeywords, `<span style="color: #f00">${nowKeywords}</span>`)
+      return val.replace(nowKeywords, `<span style="color: #f00">${nowKeywords}</span>`)
       return val
     }
   },
@@ -97,7 +97,7 @@ export default {
 
     // 点击搜索
     handleSearch () {
-      this.getSearchPostList()
+      // this.getSearchPostList()
       this.$router.push({
         path: '/search',
         query: { keywords: this.keywords }
@@ -113,6 +113,16 @@ export default {
   components: {
     comHeader,
     comFooter
+  },
+  watch: {
+    $route: {
+      deep: true,
+      handler () {
+        this.keywords = this.$route.query.keywords || ''
+        this.queryKeyWords = this.keywords
+        this.getSearchPostList()
+      }
+    }
   }
 }
 </script>

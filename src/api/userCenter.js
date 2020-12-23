@@ -47,3 +47,36 @@ export function fetchHistory (data) {
     data
   })
 }
+
+export function modifyProfile (data) {
+  return request({
+    url: '/front/userCenter/modifyProfile',
+    method: 'post',
+    data
+  })
+}
+
+export function uploadAvatar (data) {
+  return request({
+    url: '/front/userCenter/uploadAvatar',
+    method: 'post',
+    headers: {'Content-Type':'multipart/form-data'},
+    data
+  })
+}
+
+export function modifyAvatar (data) {
+  return request({
+    url: '/front/userCenter/modifyAvatar',
+    method: 'post',
+    data
+  })
+}
+
+export function deleteAvatar (data) {
+  return request({
+    url: '/front/userCenter/deleteAvatar',
+    method: 'post',
+    data
+  })
+}

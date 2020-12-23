@@ -5,6 +5,7 @@
       <div class="inner my-container">
         <div class="user_avatar">
           <img :src="userInfo.avatar || '/static/img/photo.jpg'" alt="avatar">
+          <p v-if="self" class="modify_img" @click="handleUploadAvatar">上传头像</p>
         </div>
         <div class="user_info">
           <div class="name">
@@ -39,6 +40,38 @@
       </el-row>
     </div>
     <com-footer></com-footer>
+
+    <el-dialog
+      title="上传头像"
+      :visible.sync="dialogVisible"
+      width="500px"
+      @open="handleDialogOpen"
+      @close="handleDialogOpen"
+      >
+      <el-upload
+        class="upload-wrap"
+        ref="upload"
+        :drag="!showUpload"
+        action="https://jsonplaceholder.typicode.com/posts/"
+        :auto-upload="false"
+        :file-list="fileList"
+        list-type="picture"
+        :limit="1"
+        :on-change="handleChange"
+        :on-remove="() => showUpload = false"
+        :http-request="handleRequestUpload"
+        >
+        <div v-show="!showUpload">
+          <i class="el-icon-upload"></i>
+          <div class="el-upload__text">将文件拖到此处，或<em>点击上传</em></div>
+        </div>
+        <div v-show="!showUpload" class="el-upload__tip" slot="tip">只能上传jpg/png文件，且不超过500kb</div>
+      </el-upload>
+      <span slot="footer" class="dialog-footer">
+        <el-button @click="dialogVisible = false" size="small">取 消</el-button>
+        <el-button style="margin-left: 10px;" size="small" type="primary" @click="$refs.upload.submit()" v-show="showUpload">上传并保存</el-button>
+      </span>
+    </el-dialog>
   </div>
 </template>
 
@@ -46,7 +79,7 @@
 import Cookies from 'js-cookie'
 import comHeader from '@/components/comHeader'
 import comFooter from '@/components/comFooter'
-import { getUserCenterInfo } from '@/api/userCenter'
+import { getUserCenterInfo, uploadAvatar, modifyAvatar, deleteAvatar } from '@/api/userCenter'
 import { getUserInfo } from '@/utils'
 
 export default {
@@ -54,11 +87,75 @@ export default {
     return {
       userInfo: {},
       nowUserId: undefined,
-      prefix: '我'
+      prefix: '我',
+      self: false,
+      dialogVisible: false,
+      // 上传的文件列表
+      fileList: [],
+      // 上传并保存 的 显示
+      showUpload: false
     }
   },
   methods: {
+    // 点击上传头像
+    handleUploadAvatar () {
+      this.dialogVisible = true
+    },
 
+    handleChange (file, fileList) {
+      if (file.status == 'ready') {
+        this.showUpload = true
+      }
+    },
+
+    // 头像上传对话框打开
+    handleDialogOpen () {
+      // 清空图片上传中所有的数据
+      this.fileList = []
+      if (this.$refs.upload)
+        this.$refs.upload.uploadFiles = []
+      this.showUpload = false
+    },
+
+    // 将头像上传至服务器并修改用户头像
+    async handleRequestUpload (param) {
+      let fileUrl = this.$refs.upload.uploadFiles[0].url
+      const file = param.file
+      // 判断图片大小是否小于2M
+      if (file.size / 1024 / 1024 > 2) {
+        this.$alert('上传图片大小不能超过 2MB!', '提示', { type: 'error' });
+        this.fileList = []
+        this.$refs.upload.uploadFiles = []
+      }
+      // return
+      const forms = new FormData()
+      forms.append('file', file)
+      // 发送请求，上传用户头像
+      let res = await uploadAvatar(forms)
+      let url = res.data.url
+      // 发送请求，将用户头像的数据修改
+      try {
+        let res1 = await modifyAvatar({
+          user_id: this.userInfo.id,
+          avatar: url
+        })
+      } catch (e) {
+        // 如果修改失败
+        this.dialogVisible = false
+        return
+      }
+      let myUserInfo = JSON.parse(getUserInfo())
+      myUserInfo.avatar = url
+      // 修改cookies中用户的头像
+      Cookies.set('forum-user', myUserInfo)
+      // 修改当前页面用户的头像
+      this.userInfo.avatar = url
+      this.dialogVisible = false
+      this.$message({
+        message: '修改头像成功',
+        type: 'success'
+      })
+    }
   },
   async mounted () {
     // this.userInfo = JSON.parse(getUserInfo())
@@ -68,10 +165,21 @@ export default {
     this.userInfo = res.data
     if (this.nowUserId != JSON.parse(getUserInfo()).id)
       this.prefix = 'Ta'
+    else
+      this.self = true
   },
   components: {
     comHeader,
     comFooter
+  },
+  watch: {
+    fileList: {
+      deep: true,
+      handler () {
+        if (this.fileList.length >= 1)
+          this.showUpload = true
+      }
+    }
   }
 }
 </script>
@@ -89,12 +197,35 @@ export default {
         display: flex;
         align-items: center;
         .user_avatar {
-          padding: 0 40px;
+          margin: 0 40px;
+          position: relative;
+          border-radius: 50%;
+          overflow: hidden;
           img {
-            border-radius: 50%;
             width: 80px;
             height: 80px;
             object-fit: cover;
+            border-radius: 50%;
+          }
+          .modify_img {
+            color: #fff;
+            font-size: 12px;
+            text-align: center;
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            width: 80px;
+            height: 24px;
+            line-height: 24px;
+            background: rgba(0,0,0,.8);
+            opacity: 0;
+            transition-duration: 0.2s;
+          }
+          &:hover {
+            cursor: pointer;
+            .modify_img {
+              opacity: 1;
+            }
           }
         }
         .user_info {
@@ -154,6 +285,13 @@ export default {
         }
       }
     }
-    
+
+    .upload-wrap {
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      align-items: center;
+    }
+
   }
 </style>
