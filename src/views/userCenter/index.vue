@@ -79,7 +79,7 @@
 import Cookies from 'js-cookie'
 import comHeader from '@/components/comHeader'
 import comFooter from '@/components/comFooter'
-import { getUserCenterInfo, uploadAvatar, modifyAvatar, deleteAvatar } from '@/api/userCenter'
+import { getUserCenterInfo, uploadAvatar, modifyAvatar } from '@/api/userCenter'
 import { getUserInfo } from '@/utils'
 
 export default {
@@ -104,7 +104,46 @@ export default {
 
     handleChange (file, fileList) {
       if (file.status == 'ready') {
-        this.showUpload = true
+        // 选择了文件
+        let fileInfo = file.raw
+        // 判断图片大小是否小于2M
+        if (fileInfo.size / 1024 / 1024 > 2) {
+          this.$alert('上传图片大小不能超过 2MB!', '提示', { type: 'error' })
+          this.fileList = []
+          this.$refs.upload.uploadFiles = []
+          return
+        } else if (fileInfo.type.indexOf('image') == -1) {
+          // 判断选择的是否为图片
+          this.$alert('请选择图片资源!', '提示', { type: 'error' })
+          this.fileList = []
+          this.$refs.upload.uploadFiles = []
+          return
+        }
+
+        function checkImg (url) {
+          return new Promise((resolve, reject) => {
+            let img = new Image()
+            img.src = url
+            img.onload = () => {
+              if (img.width < 150 || img.height < 150) {
+                reject()
+              } else {
+                resolve()
+              }
+            }
+          })
+        }
+        // 检查文件大小
+        checkImg(file.url)
+        .then(() => {
+          this.showUpload = true
+        })
+        .catch(() => {
+          this.$alert('图片宽度*高度至少为150*150像素!', '提示', { type: 'error' })
+          this.fileList = []
+          this.$refs.upload.uploadFiles = []
+        })
+
       }
     },
 
@@ -121,29 +160,23 @@ export default {
     async handleRequestUpload (param) {
       let fileUrl = this.$refs.upload.uploadFiles[0].url
       const file = param.file
-      // 判断图片大小是否小于2M
-      if (file.size / 1024 / 1024 > 2) {
-        this.$alert('上传图片大小不能超过 2MB!', '提示', { type: 'error' });
-        this.fileList = []
-        this.$refs.upload.uploadFiles = []
-      }
-      // return
+      
       const forms = new FormData()
       forms.append('file', file)
+      forms.append('user_id', this.userInfo.id)
       // 发送请求，上传用户头像
-      let res = await uploadAvatar(forms)
-      let url = res.data.url
-      // 发送请求，将用户头像的数据修改
+      let res
       try {
-        let res1 = await modifyAvatar({
-          user_id: this.userInfo.id,
-          avatar: url
-        })
+        res = await uploadAvatar(forms)
       } catch (e) {
-        // 如果修改失败
+        // 头像修改失败，将上传框关闭显示
         this.dialogVisible = false
         return
       }
+
+      // 请求并返回成功数据后...
+      let url = res.data.url
+      console.log(url);
       let myUserInfo = JSON.parse(getUserInfo())
       myUserInfo.avatar = url
       // 修改cookies中用户的头像
@@ -155,6 +188,7 @@ export default {
         message: '修改头像成功',
         type: 'success'
       })
+      
     }
   },
   async mounted () {
@@ -171,15 +205,6 @@ export default {
   components: {
     comHeader,
     comFooter
-  },
-  watch: {
-    fileList: {
-      deep: true,
-      handler () {
-        if (this.fileList.length >= 1)
-          this.showUpload = true
-      }
-    }
   }
 }
 </script>

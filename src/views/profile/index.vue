@@ -40,7 +40,7 @@
       </div>
       <div class="msg_item">
         <div class="msg_key introduction">简介</div>
-        <div class="msg_val"><el-input auto-complete="off" v-model="userInfo.sign" type="textarea" maxlength="300" rows="5" :autosize="{ minRows: 5, maxRows: 10}" show-word-limit placeholder="请输入简介"></el-input></div>
+        <div class="msg_val"><el-input auto-complete="off" v-model="userInfo.introduction" type="textarea" maxlength="300" rows="5" :autosize="{ minRows: 5, maxRows: 10}" show-word-limit placeholder="请输入简介"></el-input></div>
       </div>
       <div class="msg_item">
         <div class="msg_key">性别</div>
@@ -93,7 +93,9 @@ export default {
     // 保存修改的用户信息
     async handleSaveProfile () {
       this.modifyProfile = false
-      let res = await modifyProfile(this.userInfo)
+      const data = Object.assign({}, this.userInfo)
+      delete data['avatar']
+      let res = await modifyProfile(data)
       this.$message({
         message: '信息修改成功',
         type: 'success'
@@ -108,7 +110,9 @@ export default {
   .profile_wrap {
     padding: 24px;
     .title {
-      font-size: 16px;
+      span {
+        font-size: 16px;
+      }
       color: #222226;
       font-weight: bold;
       display: flex;

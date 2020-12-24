@@ -12,7 +12,7 @@
           <li v-for="item in searchPostList" :key="item.id">
             <div class="post_item">
               <div class="title">
-                <h2><router-link target="_blank" :to="`/post/${item.id}`">{{item.title | emphasizeKeywords(queryKeyWords)}}</router-link></h2>
+                <h2><router-link target="_blank" :to="`/post/${item.id}`" v-html="emphasizeKeywords(item.title)"></router-link></h2>
               </div>
               <div class="summary_content">
                   {{item.content}}
@@ -70,13 +70,6 @@ export default {
       total: 0
     }
   },
-  filters: {
-    emphasizeKeywords (val, queryKeyWords) {
-      let nowKeywords = queryKeyWords
-      return val.replace(nowKeywords, `<span style="color: #f00">${nowKeywords}</span>`)
-      return val
-    }
-  },
   mounted () {
     this.keywords = this.$route.query.keywords || ''
     this.queryKeyWords = this.keywords
@@ -93,6 +86,13 @@ export default {
 
       this.searchPostList = res.data.items
       this.total = res.data.total
+    },
+
+    // 强调搜索关键字
+    emphasizeKeywords (val) {
+      let nowKeywords = this.queryKeyWords
+      return val.replace(nowKeywords, `<span style="color: #f00; font-size: 18px; font-weight: bold;">${nowKeywords}</span>`)
+      return val
     },
 
     // 点击搜索
@@ -164,9 +164,6 @@ export default {
                     display: block;
                     &:link {
                       color: #3d3d3d;
-                    }
-                    &:visited {
-                      color: #b8b8b8;
                     }
                     &:hover {
                       color: #409EFF;

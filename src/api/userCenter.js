@@ -72,11 +72,3 @@ export function modifyAvatar (data) {
     data
   })
 }
-
-export function deleteAvatar (data) {
-  return request({
-    url: '/front/userCenter/deleteAvatar',
-    method: 'post',
-    data
-  })
-}

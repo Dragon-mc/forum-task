@@ -111,6 +111,7 @@ export default {
             // flex: 8;
             font-weight: bold;
             padding-left: 20px;
+            width: 100%;
           }
           .collection_time {
             // flex: 2;
