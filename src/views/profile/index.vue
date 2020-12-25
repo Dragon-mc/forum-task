@@ -77,8 +77,8 @@ export default {
   methods: {
     // 获取展示用户资料列表
     async getShowUserInfo () {
-      if (Object.keys(this.$route.query).length) {
-        this.userInfo = this.$route.query
+      if (this.$route.params.userInfo) {
+        this.userInfo = this.$route.params.userInfo
       } else {
         let res = await getUserCenterInfo({id: this.$route.params.id})
         this.userInfo = res.data

@@ -21,13 +21,16 @@
           </el-col>
         </el-row>
         <el-row class="post_info">
-          <el-col :span="24" class="info_left">
+          <el-col :span="22" class="info_left">
             <div class="post_title">
               <router-link :to="`/post/${item.id}`" target="_blank">{{item.title}}</router-link>
             </div>
             <div class="post_content">
               {{item.content}}
             </div>
+          </el-col>
+          <el-col :span="2" class="edit" v-if="self">
+            <i class="el-icon-edit-outline" @click="handleEdit(item)"></i>
           </el-col>
         </el-row>
       </div>
@@ -45,7 +48,8 @@ export default {
   data () {
     return {
       postList: [],
-      prefix: '我'
+      prefix: '我',
+      self: false
     }
   },
   filters: {
@@ -57,12 +61,25 @@ export default {
     this.getPublishList()
     if (JSON.parse(getUserInfo()).id != this.$route.params.id)
       this.prefix = 'Ta'
+    else
+      this.self = true
   },
   methods: {
     // 获取发布列表
     async getPublishList () {
       let res = await fetchPublish({id: this.$route.params.id})
       this.postList = res.data
+    },
+
+    // 编辑帖子
+    handleEdit (item) {
+      let id = item.id
+      this.$router.push({
+        name: 'editor',
+        params: {
+          item: item
+        }
+      })
     }
   }
 }
@@ -118,8 +135,9 @@ export default {
           .info_left {
             // flex: 9;
             .post_title {
-              margin-bottom: 10px;
+              margin-bottom: 8px;
               a {
+                display: inline-block;
                 font-size: 18px;
                 text-overflow: ellipsis;
                 overflow: hidden;
@@ -141,6 +159,20 @@ export default {
               white-space: nowrap;
               overflow: hidden;
               text-overflow: ellipsis;
+            }
+          }
+
+          .edit {
+            height: 54px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            i {
+              font-size: 20px;
+              cursor: pointer;
+              &:hover {
+                color: #409EFF;
+              }
             }
           }
           

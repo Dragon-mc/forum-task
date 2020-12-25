@@ -19,11 +19,16 @@
         </el-cascader>
       </div>
       <div class="func_btn">
-        <el-button class="save_btn" @click="handleSaveDraft">保存草稿</el-button>
-        <el-button class="publish_btn" @click="handlePublish">发布帖子</el-button>
+        <template v-if="!edit">
+          <el-button class="save_btn" @click="handleSaveDraft">保存草稿</el-button>
+          <el-button class="publish_btn" @click="handlePublish">发布帖子</el-button>
+        </template>
+        <template v-else>
+          <el-button class="publish_btn" @click="handleSaveEdit">保存编辑</el-button>
+        </template>
       </div>
       <div class="user_avatar">
-        <img src="https://wpimg.wallstcn.com/f778738c-e4f8-4870-b634-56703b4acafe.gif?imageView2/1/w/80/h/80" alt="">
+        <img :src="userInfo.avatar || '/static/img/photo.jpg'" alt="">
       </div>
     </div>
     <editor
@@ -39,7 +44,7 @@
 import tinymce from 'tinymce/tinymce'
 import Editor from '@tinymce/tinymce-vue'
 import moment from 'moment'
-import { uploadImg, postPublish } from '@/api/post'
+import { uploadImg, postPublish, postEdit } from '@/api/post'
 import { fetchCategory } from '@/api/category'
 import { getUserInfo } from '@/utils'
 
@@ -88,6 +93,7 @@ export default {
       title: '',
       content: '',
       sub_id: undefined,
+      edit: false,
       userInfo: {},
       propsOption: {
         expandTrigger: 'hover',
@@ -157,6 +163,27 @@ export default {
     }
     this.userInfo = JSON.parse(getUserInfo() || {})
     this.getCategoryOptions()
+    
+    // 如果是编辑则将编辑数据赋值到当前页面中
+    if (this.$route.params.item) {
+      let item = this.$route.params.item
+      this.edit = true
+      this.title = item.title
+      this.content = item.content
+      this.post_id = item.id
+      // 如果分类列表暂时还未获取到
+      if (!this.categoryOptions.length) {
+        this.categoryReady = (category) => {
+          category.forEach((v, i)=> v.sub_cate.forEach(v1 => {
+            // 查找到分类id后返回
+            if (item.sub_id == v1.id) {
+              this.sub_id=[category[i].id, v1.id]
+              return false
+            }
+          }))
+        }
+      }
+    }
   },
   methods: {
     // 点击返回按钮
@@ -169,6 +196,7 @@ export default {
     async getCategoryOptions () {
       let res = await fetchCategory()
       this.categoryOptions = res.data
+      if (this.categoryReady) this.categoryReady(res.data)
     },
 
     // 上传图片
@@ -203,7 +231,7 @@ export default {
       let { content, title, sub_id } = this
       // 检查数据
       if (!this.checkValid()) return
-      let res = await postPublish({
+      await postPublish({
         title,
         content,
         user_id: this.userInfo.id,
@@ -213,6 +241,26 @@ export default {
       })
       this.$message({
         message: '发布成功',
+        type: 'success'
+      })
+      setTimeout(() => {
+        this.$router.go(-1)
+      },500)
+    },
+
+    // 保存编辑
+    async handleSaveEdit () {
+      let { content, title, sub_id } = this
+      // 检查数据
+      if (!this.checkValid()) return
+      await postEdit({
+        title,
+        content,
+        sub_id: Number(sub_id[1]),
+        id: Number(this.post_id)
+      })
+      this.$message({
+        message: '编辑成功',
         type: 'success'
       })
       setTimeout(() => {

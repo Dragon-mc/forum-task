@@ -18,7 +18,7 @@ export function login (data) {
 
 export function cancelAttention (data) {
   return request({
-    url: '/front/userCenter/cancelAttention',
+    url: '/front/user/cancelAttention',
     method: 'post',
     data
   })
@@ -26,7 +26,23 @@ export function cancelAttention (data) {
 
 export function attention (data) {
   return request({
-    url: '/front/userCenter/attention',
+    url: '/front/user/attention',
+    method: 'post',
+    data
+  })
+}
+
+export function calcelCollection (data) {
+  return request({
+    url: '/front/user/calcelCollection',
+    method: 'post',
+    data
+  })
+}
+
+export function collection (data) {
+  return request({
+    url: '/front/user/collection',
     method: 'post',
     data
   })

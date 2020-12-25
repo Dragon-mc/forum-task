@@ -5,37 +5,44 @@
     </div>
     <div class="collection_list">
       <div class="collection_item" v-for="item in collectionList" :key="item.id">
-        <div class="user_info">
-          <div class="user_avatar">
-            <router-link :to="`/uc/${item.user_id}`" target="_blank">
-              <img :src="item.avatar || '/static/img/photo.jpg'" alt="">
-            </router-link>
-          </div>
-          <div class="user_name">
-            <router-link :to="`/uc/${item.user_id}`" target="_blank"><span>{{item.nickname || item.username}}</span></router-link>
-          </div>
-          <div class="collection_time">
-            {{item.time | fromNow}}
-          </div>
-        </div>
-        <el-row class="post_info">
-          <el-col :span="20" class="info_left">
-            <div class="post_title">
-              <router-link :to="`/post/${item.id}`" target="_blank">{{item.title}}</router-link>
+        <el-row>
+          <el-col :xs="21" :sm="21" :md="22" :lg="23" class="info_wrap">
+            <div class="user_info">
+              <div class="user_avatar">
+                <router-link :to="`/uc/${item.user_id}`" target="_blank">
+                  <img :src="item.avatar || '/static/img/photo.jpg'" alt="">
+                </router-link>
+              </div>
+              <div class="user_name">
+                <router-link :to="`/uc/${item.user_id}`" target="_blank"><span>{{item.nickname || item.username}}</span></router-link>
+              </div>
+              <div class="collection_time">
+                {{item.time | fromNow}}
+              </div>
             </div>
-            <div class="post_content">
-              {{item.content}}
-            </div>
-          </el-col>
-          <el-col :span="4" class="info_right">
-            <el-row :gutter="12">
-              <el-col :sm="12" :md="12" :lg="12" class="read_num">
-                <router-link :to="`/post/${item.id}`" target="_blank"><i class="el-icon-view"></i>{{item.read_times}}</router-link>
+            <el-row class="post_info" :gutter="12">
+              <el-col :xs="19" :sm="19" :md="20" :lg="20" class="info_left">
+                <div class="post_title">
+                  <router-link :to="`/post/${item.id}`" target="_blank">{{item.title}}</router-link>
+                </div>
+                <div class="post_content">
+                  {{item.content}}
+                </div>
               </el-col>
-              <el-col :sm="12" :md="12" :lg="12" class="comment_num">
-                <router-link :to="`/post/${item.id}`" target="_blank"><i class="el-icon-view"></i>{{item.comment_times}}</router-link>
+              <el-col :xs="5" :sm="5" :md="4" :lg="4" class="info_right">
+                <el-row :gutter="12">
+                  <el-col :sm="12" :md="12" :lg="12" class="read_num">
+                    <router-link :to="`/post/${item.id}`" target="_blank"><i class="el-icon-view"></i>{{item.read_times}}</router-link>
+                  </el-col>
+                  <el-col :sm="12" :md="12" :lg="12" class="comment_num">
+                    <router-link :to="`/post/${item.id}`" target="_blank"><i class="el-icon-view"></i>{{item.comment_times}}</router-link>
+                  </el-col>
+                </el-row>
               </el-col>
             </el-row>
+          </el-col>
+          <el-col :xs="3" :sm="3" :md="2" :lg="1" class="collection_operate">
+            <i class="iconfont" :class="item.is_collection?'icon-collection-b':'icon-collection'" @click="handleCollectionOperate(item)"></i>
           </el-col>
         </el-row>
       </div>
@@ -47,13 +54,16 @@
 import moment from 'moment'
 moment.locale('zh-cn')
 import { fetchCollection } from '@/api/userCenter'
+import { collection, calcelCollection } from '@/api/user'
 import { getUserInfo } from '@/utils'
 
 export default {
   data () {
     return {
       collectionList: [],
-      prefix: '我'
+      prefix: '我',
+      // 观看者id，即自己的id
+      visit_id: undefined
     }
   },
   filters: {
@@ -62,16 +72,45 @@ export default {
     }
   },
   mounted () {
+    this.visit_id = JSON.parse(getUserInfo() || {}).id
     this.getCollectionList()
-
-    if (JSON.parse(getUserInfo()).id != this.$route.params.id)
+    if (this.visit_id != this.$route.params.id)
       this.prefix = 'Ta'
   },
   methods: {
     // 获取收藏列表
     async getCollectionList () {
-      let res = await fetchCollection({id: this.$route.params.id})
+      let res = await fetchCollection({
+        id: this.$route.params.id,
+        visit_id: this.visit_id
+      })
       this.collectionList = res.data
+    },
+
+    // 处理收藏点击
+    async handleCollectionOperate (item) {
+      let message = ''
+      if (item.is_collection) {
+        // 取消收藏
+        await calcelCollection({
+          post_id: item.id,
+          user_id: this.visit_id
+        })
+        message = '取消收藏'
+      } else {
+        // 收藏
+        await collection({
+          post_id: item.id,
+          user_id: this.visit_id,
+          time: moment().format('YYYY-MM-DD HH:mm:ss')
+        })
+        message = '收藏成功'
+      }
+      item.is_collection = !item.is_collection
+      this.$message({
+        message,
+        type: 'success'
+      })
     }
   }
 }
@@ -87,6 +126,23 @@ export default {
     }
     .collection_list {
       .collection_item {
+        // display: flex;
+        .info_wrap {
+          // width: 100%;
+        }
+        .collection_operate {
+          display: flex;
+          justify-content: flex-end;
+          align-items: center;
+          height: 112px;
+          .icon-collection-b {
+            color: rgb(255,204,118);
+          }
+          .iconfont {
+            cursor: pointer;
+            font-size: 18px;
+          }
+        }
         margin-top: 15px;
         padding: 18px;
         border: 1px solid #ededed;
@@ -126,6 +182,8 @@ export default {
             .post_title {
               margin-bottom: 10px;
               a {
+                width: 100%;
+                display: inline-block;
                 font-size: 18px;
                 text-overflow: ellipsis;
                 overflow: hidden;

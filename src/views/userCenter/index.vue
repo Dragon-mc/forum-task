@@ -3,18 +3,24 @@
     <com-header :index="2"></com-header>
     <div class="info_card">
       <div class="inner my-container">
-        <div class="user_avatar">
-          <img :src="userInfo.avatar || '/static/img/photo.jpg'" alt="avatar">
-          <p v-if="self" class="modify_img" @click="handleUploadAvatar">上传头像</p>
+        <div class="left_info_wrap">
+          <div class="user_avatar">
+            <img :src="userInfo.avatar || '/static/img/photo.jpg'" alt="avatar">
+            <p v-if="self" class="modify_img" @click="handleUploadAvatar">上传头像</p>
+          </div>
+          <div class="user_info">
+            <div class="name">
+              {{userInfo.nickname || userInfo.username}}
+            </div>
+            <div class="interactive">
+              关注<span class="attention">{{userInfo.attention_num}}</span>
+              粉丝<span class="fans">{{userInfo.fans_num}}</span>
+            </div>
+          </div>
         </div>
-        <div class="user_info">
-          <div class="name">
-            {{userInfo.nickname || userInfo.username}}
-          </div>
-          <div class="interactive">
-            关注<span class="attention">{{userInfo.attention_num}}</span>
-            粉丝<span class="fans">{{userInfo.fans_num}}</span>
-          </div>
+        <div class="attention_wrap" v-if="!self">
+          <div class="at_btn" v-if="!userInfo.is_attention" @click="handleAttentionOperate">关注此人</div>
+          <div class="has_at_btn" v-else @click="handleAttentionOperate">取消关注</div>
         </div>
       </div>
     </div>
@@ -23,7 +29,7 @@
         <div class="main">
           <el-col :span="3">
             <ul class="nav">
-              <li><router-link :to="{path: `/uc/${nowUserId}/profile`, query: userInfo}">{{prefix=='我'?'个人':'Ta的'}}资料</router-link></li>
+              <li><router-link :to="{name: 'profile', params: {userInfo}}">{{prefix=='我'?'个人':'Ta的'}}资料</router-link></li>
               <li><router-link :to="`/uc/${nowUserId}/collection`">{{prefix}}收藏的</router-link></li>
               <li><router-link :to="`/uc/${nowUserId}/myPublish`">{{prefix}}发布的</router-link></li>
               <li><router-link :to="`/uc/${nowUserId}/attention`">{{prefix}}关注的</router-link></li>
@@ -77,9 +83,11 @@
 
 <script>
 import Cookies from 'js-cookie'
+import moment from 'moment'
 import comHeader from '@/components/comHeader'
 import comFooter from '@/components/comFooter'
 import { getUserCenterInfo, uploadAvatar, modifyAvatar } from '@/api/userCenter'
+import { attention, cancelAttention } from '@/api/user'
 import { getUserInfo } from '@/utils'
 
 export default {
@@ -96,6 +104,24 @@ export default {
       showUpload: false
     }
   },
+
+  async mounted () {
+    // 获取路由中的id，保存为当前查看用户的id
+    this.visit_id = JSON.parse(getUserInfo() || {}).id
+    this.nowUserId = this.$route.params.id
+    let res = await getUserCenterInfo({
+      id: this.nowUserId,
+      visit_id: this.visit_id
+    })
+    this.userInfo = res.data
+    // console.log(this.userInfo);
+    if (this.nowUserId != this.visit_id)
+      this.prefix = 'Ta'
+    else
+      this.self = true
+    // console.log(this.$route);
+  },
+
   methods: {
     // 点击上传头像
     handleUploadAvatar () {
@@ -176,7 +202,6 @@ export default {
 
       // 请求并返回成功数据后...
       let url = res.data.url
-      console.log(url);
       let myUserInfo = JSON.parse(getUserInfo())
       myUserInfo.avatar = url
       // 修改cookies中用户的头像
@@ -189,19 +214,49 @@ export default {
         type: 'success'
       })
       
+    },
+
+    // 关注和取消关注用户
+    async handleAttentionOperate () {
+      let message = ''
+      if (this.userInfo.is_attention) {
+        // 取消关注
+        await cancelAttention({
+          active_id: this.visit_id,
+          passive_id: this.nowUserId
+        })
+        message = '取消关注'
+      } else {
+        // 关注
+        await attention({
+          active_id: this.visit_id,
+          passive_id: this.nowUserId,
+          time: moment().format('YYYY-MM-DD HH:mm:ss')
+        })
+        message = '关注成功'
+      }
+      this.userInfo.is_attention = !this.userInfo.is_attention
+      this.$message({
+        message,
+        type: 'success'
+      })
+    }
+
+  },
+
+  watch: {
+    '$route.params.id': {
+      handler () {
+        // 当前查看的用户id
+        let id = this.$route.params.id
+        if (id != this.userInfo.id) {
+          // 如果当前查看的用户id，和已存在用户信息的id不一样，则重新获取
+          this.$router.go(0)
+        }
+      }
     }
   },
-  async mounted () {
-    // this.userInfo = JSON.parse(getUserInfo())
-    // 获取路由中的id，保存为当前查看用户的id
-    this.nowUserId = this.$route.params.id
-    let res = await getUserCenterInfo({id: this.nowUserId})
-    this.userInfo = res.data
-    if (this.nowUserId != JSON.parse(getUserInfo()).id)
-      this.prefix = 'Ta'
-    else
-      this.self = true
-  },
+
   components: {
     comHeader,
     comFooter
@@ -220,53 +275,83 @@ export default {
       .inner {
         height: 100%;
         display: flex;
+        justify-content: space-between;
         align-items: center;
-        .user_avatar {
-          margin: 0 40px;
-          position: relative;
-          border-radius: 50%;
-          overflow: hidden;
-          img {
-            width: 80px;
-            height: 80px;
-            object-fit: cover;
+        .left_info_wrap {
+          display: flex;
+          align-items: center;
+          .user_avatar {
+            margin: 0 40px;
+            position: relative;
             border-radius: 50%;
-          }
-          .modify_img {
-            color: #fff;
-            font-size: 12px;
-            text-align: center;
-            position: absolute;
-            bottom: 0;
-            left: 0;
-            width: 80px;
-            height: 24px;
-            line-height: 24px;
-            background: rgba(0,0,0,.8);
-            opacity: 0;
-            transition-duration: 0.2s;
-          }
-          &:hover {
-            cursor: pointer;
+            overflow: hidden;
+            img {
+              width: 80px;
+              height: 80px;
+              object-fit: cover;
+              border-radius: 50%;
+            }
             .modify_img {
-              opacity: 1;
+              color: #fff;
+              font-size: 12px;
+              text-align: center;
+              position: absolute;
+              bottom: 0;
+              left: 0;
+              width: 80px;
+              height: 24px;
+              line-height: 24px;
+              background: rgba(0,0,0,.8);
+              opacity: 0;
+              transition-duration: 0.2s;
+            }
+            &:hover {
+              cursor: pointer;
+              .modify_img {
+                opacity: 1;
+              }
+            }
+          }
+          .user_info {
+            color: #fff;
+            .name {
+              font-size: 18px;
+              font-weight: bold;
+              margin-bottom: 20px;
+            }
+            .interactive {
+              .attention {
+                margin-right: 10px;
+                padding-left: 6px;
+              }
+              .fans {
+                padding-left: 6px;
+              }
             }
           }
         }
-        .user_info {
-          color: #fff;
-          .name {
-            font-size: 18px;
-            font-weight: bold;
-            margin-bottom: 20px;
+        .attention_wrap {
+          padding-right: 30px;
+          div {
+            height: 30px;
+            border-radius: 15px;
+            width: 80px;
+            color: #fff;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            cursor: pointer;
           }
-          .interactive {
-            .attention {
-              margin-right: 10px;
-              padding-left: 6px;
+          .at_btn {
+            background: #409EFF;
+            &:hover {
+              opacity: 0.9;
             }
-            .fans {
-              padding-left: 6px;
+          }
+          .has_at_btn {
+            border: 1px solid #267dcc;
+            &:hover {
+              background: rgba(41,149,255, 0.1);
             }
           }
         }

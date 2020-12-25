@@ -26,42 +26,42 @@ export default new Router({
     },
     {
       path: '/index',
-      name: '首页',
+      name: 'index',
       component: index
     },
     {
       path: '/cate',
-      name: '分类',
+      name: 'cate',
       component: category
     },
     {
       path: '/editor',
-      name: '发帖',
+      name: 'editor',
       component: editor
     },
     {
       path: '/post/:id',
-      name: '帖子详情',
+      name: 'post',
       component: post
     },
     {
       path: '/search',
-      name: '搜索',
+      name: 'search',
       component: search
     },
     {
       path: '/login',
-      name: '登录',
+      name: 'login',
       component: login
     },
     {
       path: '/register',
-      name: '注册',
+      name: 'register',
       component: register
     },
     {
       path: '/uc/:id',
-      name: '个人中心',
+      name: 'userCenter',
       component: userCenter,
       children: [
         {
@@ -70,32 +70,32 @@ export default new Router({
         },
         {
           path: 'profile',
-          name: '个人资料',
+          name: 'profile',
           component: profile
         },
         {
           path: 'collection',
-          name: '收藏',
+          name: 'collection',
           component: collection
         },
         {
           path: 'myPublish',
-          name: '收藏',
+          name: 'myPublish',
           component: myPublish
         },
         {
           path: 'attention',
-          name: '关注',
+          name: 'attention',
           component: attention
         },
         {
           path: 'fans',
-          name: '粉丝',
+          name: 'fans',
           component: fans
         },
         {
           path: 'history',
-          name: '历史记录',
+          name: 'history',
           component: history
         }
       ]

@@ -32,3 +32,11 @@ export function postPublish (data) {
     data
   })
 }
+
+export function postEdit (data) {
+  return request({
+    url: '/front/post/postEdit',
+    method: 'post',
+    data
+  })
+}
