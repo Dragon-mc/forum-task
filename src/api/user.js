@@ -55,3 +55,11 @@ export function history (data) {
     data
   })
 }
+
+export function feedback (data) {
+  return request({
+    url: '/front/user/feedback',
+    method: 'post',
+    data
+  })
+}

@@ -116,9 +116,11 @@
 
       <div class="bottom_wrap">
         <div>已有账号？</div>
-        <el-button type="primary">
-          登录
-        </el-button>
+        <router-link to="/login">
+          <el-button type="primary">
+            登录
+          </el-button>
+        </router-link>
       </div>
     </el-form>
 

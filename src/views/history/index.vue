@@ -3,8 +3,8 @@
     <div class="title">
       历史记录
     </div>
-    <div class="collection_list">
-      <div class="collection_item" v-for="item in historyList" :key="item.id">
+    <div class="history_list">
+      <div class="history_item" v-for="item in historyList" :key="item.id">
         <div class="user_info">
           <div class="user_avatar">
             <router-link :to="`/uc/${item.user_id}`" target="_blank">
@@ -33,11 +33,20 @@
                 <router-link :to="`/post/${item.id}`" target="_blank"><i class="el-icon-view"></i>{{item.read_times}}</router-link>
               </el-col>
               <el-col :sm="12" :md="12" :lg="12" class="comment_num">
-                <router-link :to="`/post/${item.id}`" target="_blank"><i class="el-icon-view"></i>{{item.comment_times}}</router-link>
+                <router-link :to="`/post/${item.id}`" target="_blank"><i class="el-icon-chat-dot-round"></i>{{item.comment_times}}</router-link>
               </el-col>
             </el-row>
           </el-col>
         </el-row>
+      </div>
+      <div class="pagination" v-if="total > paginationData.limit">
+        <el-pagination
+          @current-change="handleCurrentChange"
+          :current-page="paginationData.page"
+          :page-size="paginationData.limit" 
+          layout="total, prev, pager, next, jumper"
+          :total="total">
+        </el-pagination>
       </div>
     </div>
   </div>
@@ -51,7 +60,12 @@ import { fetchHistory } from '@/api/userCenter'
 export default {
   data () {
     return {
-      historyList: []
+      historyList: [],
+      total: 0,
+      paginationData: {
+        limit: 5,
+        page: 1
+      }
     }
   },
   filters: {
@@ -65,9 +79,18 @@ export default {
   methods: {
     // 获取历史列表
     async getHistoryList () {
-      let res = await fetchHistory({id: this.$route.params.id})
-      this.historyList = res.data
+      const data = Object.assign({}, this.paginationData)
+      data.id = this.$route.params.id
+      let res = await fetchHistory(data)
+      this.historyList = res.data.items
+      this.total = res.data.total
+    },
+
+    handleCurrentChange (page) {
+      this.paginationData.page = page
+      this.getHistoryList()
     }
+
   }
 }
 </script>
@@ -80,8 +103,8 @@ export default {
       color: #222226;
       font-weight: bold;
     }
-    .collection_list {
-      .collection_item {
+    .history_list {
+      .history_item {
         margin-top: 15px;
         padding: 18px;
         border: 1px solid #ededed;
@@ -94,7 +117,6 @@ export default {
           align-items: center;
           margin-bottom: 6px;
           .user_avatar {
-            // flex: 1;
             img {
               width: 30px;
               height: 30px;
@@ -103,20 +125,17 @@ export default {
             }
           }
           .user_name {
-            // flex: 8;
+            width: 100%;
             font-weight: bold;
             padding-left: 20px;
           }
           .collection_time {
-            // flex: 2;
             width: 100%;
             text-align: right;
           }
         }
         .post_info {
-          // display: flex;
           .info_left {
-            // flex: 9;
             .post_title {
               margin-bottom: 10px;
               a {
@@ -150,7 +169,7 @@ export default {
             justify-content: flex-end;
             align-items: flex-end;
             .read_num {
-              // margin-right: 12px;
+              
             }
             .comment_num {
 
@@ -172,6 +191,16 @@ export default {
           }
         }
       }
+
+      .pagination {
+        .el-pagination {
+          display: flex;
+          justify-content: center;
+          align-items: center;
+          margin-top: 15px;
+        }
+      }
+
     }
   }
 </style>

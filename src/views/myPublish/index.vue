@@ -4,7 +4,7 @@
       {{prefix}}发布的
     </div>
     <div class="collection_list">
-      <div class="collection_item" v-for="item in postList" :key="item.id">
+      <div class="collection_item" v-for="(item, index) in postList" :key="item.id">
         <el-row class="time_and_interactive">
           <el-col :span="20" class="time">
             发布于：{{item.time | fromNow}}
@@ -31,8 +31,27 @@
           </el-col>
           <el-col :span="2" class="edit" v-if="self">
             <i class="el-icon-edit-outline" @click="handleEdit(item)"></i>
+            <el-popconfirm
+              icon="el-icon-info"
+              icon-color="red"
+              title="你确定删除这篇帖子吗？"
+              @confirm="handleDelete(item, index)"
+            >
+              <div slot="reference">
+                <i class="el-icon-delete"></i>
+              </div>
+            </el-popconfirm>
           </el-col>
         </el-row>
+      </div>
+      <div class="pagination" v-if="total > paginationData.limit">
+        <el-pagination
+          @current-change="handleCurrentChange"
+          :current-page="paginationData.page"
+          :page-size="paginationData.limit" 
+          layout="total, prev, pager, next, jumper"
+          :total="total">
+        </el-pagination>
       </div>
     </div>
   </div>
@@ -42,6 +61,7 @@
 import moment from 'moment'
 moment.locale('zh-cn')
 import { fetchPublish } from '@/api/userCenter'
+import { deletePost } from '@/api/post'
 import { getUserInfo } from '@/utils'
 
 export default {
@@ -49,7 +69,12 @@ export default {
     return {
       postList: [],
       prefix: '我',
-      self: false
+      self: false,
+      total: 0,
+      paginationData: {
+        limit: 5,
+        page: 1
+      }
     }
   },
   filters: {
@@ -59,7 +84,7 @@ export default {
   },
   mounted () {
     this.getPublishList()
-    if (JSON.parse(getUserInfo() || '{}').id != this.$route.params.id)
+    if (getUserInfo().id != this.$route.params.id)
       this.prefix = 'Ta'
     else
       this.self = true
@@ -67,8 +92,11 @@ export default {
   methods: {
     // 获取发布列表
     async getPublishList () {
-      let res = await fetchPublish({id: this.$route.params.id})
-      this.postList = res.data
+      const data = Object.assign({}, this.paginationData)
+      data.id = this.$route.params.id
+      let res = await fetchPublish(data)
+      this.postList = res.data.items
+      this.total = res.data.total
     },
 
     // 编辑帖子
@@ -80,6 +108,21 @@ export default {
           item: item
         }
       })
+    },
+
+    // 删除帖子
+    async handleDelete (item, index) {
+      await deletePost({ post_id: item.id })
+      this.$message({
+        message: '删除成功',
+        type: 'success'
+      })
+      this.postList.splice(index, 1)
+    },
+
+    handleCurrentChange (page) {
+      this.paginationData.page = page
+      this.getPublishList()
     }
   }
 }
@@ -165,7 +208,7 @@ export default {
           .edit {
             height: 54px;
             display: flex;
-            justify-content: center;
+            justify-content: space-around;
             align-items: center;
             i {
               font-size: 20px;
@@ -174,10 +217,25 @@ export default {
                 color: #409EFF;
               }
             }
+            .el-icon-delete {
+              &:hover {
+                color: #fc5531;
+              }
+            }
           }
           
         }
       }
+
+      .pagination {
+        .el-pagination {
+          display: flex;
+          justify-content: center;
+          align-items: center;
+          margin-top: 15px;
+        }
+      }
+
     }
   }
 </style>

@@ -24,6 +24,14 @@ export function fetchPublish (data) {
   })
 }
 
+export function fetchDraftPost (data) {
+  return request({
+    url: '/front/userCenter/fetchDraftPost',
+    method: 'post',
+    data
+  })
+}
+
 export function fetchAttention (data) {
   return request({
     url: '/front/userCenter/fetchAttention',

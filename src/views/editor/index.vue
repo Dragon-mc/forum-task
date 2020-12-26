@@ -19,7 +19,7 @@
         </el-cascader>
       </div>
       <div class="func_btn">
-        <template v-if="!edit">
+        <template v-if="!edit||postStatus==0">
           <el-button class="save_btn" @click="handleSaveDraft">保存草稿</el-button>
           <el-button class="publish_btn" @click="handlePublish">发布帖子</el-button>
         </template>
@@ -94,6 +94,7 @@ export default {
       content: '',
       sub_id: undefined,
       edit: false,
+      postStatus: undefined,
       userInfo: {},
       propsOption: {
         expandTrigger: 'hover',
@@ -161,7 +162,7 @@ export default {
       let height = window.innerHeight
       this.mce.style.setProperty('height', height-55+'px', 'important')
     }
-    this.userInfo = JSON.parse(getUserInfo() || '{}')
+    this.userInfo = getUserInfo()
     this.getCategoryOptions()
     
     // 如果是编辑则将编辑数据赋值到当前页面中
@@ -171,9 +172,10 @@ export default {
       this.title = item.title
       this.content = item.content
       this.post_id = item.id
+      this.postStatus = item.status
       // 如果分类列表暂时还未获取到
       if (!this.categoryOptions.length) {
-        this.categoryReady = (category) => {
+        this.categoryReady = category => {
           category.forEach((v, i)=> v.sub_cate.forEach(v1 => {
             // 查找到分类id后返回
             if (item.sub_id == v1.id) {
@@ -207,16 +209,28 @@ export default {
     // 保存草稿
     async handleSaveDraft () {
       let { content, title, sub_id } = this
-      // 检查数据
-      // if (!this.checkValid()) return
-      let res = await postPublish({
-        title,
-        content,
-        user_id: this.userInfo.id,
-        time: moment().format('YYYY-MM-DD HH:mm:ss'),
-        sub_id: sub_id ? sub_id[1] : 0,
-        status: 0
-      })
+
+      if (this.postStatus == 0) {
+        // 当前是从 待发布页面进入 对帖子进行编辑，修改帖子内容即可
+        await postEdit({
+          title,
+          content,
+          sub_id: sub_id ? sub_id[1] : 0,
+          id: this.post_id,
+          time: moment().format('YYYY-MM-DD HH:mm:ss')
+        })
+      } else {
+        // 直接从发布帖子进入的页面，则直接添加新记录
+        await postPublish({
+          title,
+          content,
+          user_id: this.userInfo.id,
+          time: moment().format('YYYY-MM-DD HH:mm:ss'),
+          sub_id: sub_id ? sub_id[1] : 0,
+          status: 0
+        })
+      }
+      
       this.$message({
         message: '保存草稿成功',
         type: 'success'
@@ -231,14 +245,29 @@ export default {
       let { content, title, sub_id } = this
       // 检查数据
       if (!this.checkValid()) return
-      await postPublish({
-        title,
-        content,
-        user_id: this.userInfo.id,
-        time: moment().format('YYYY-MM-DD HH:mm:ss'),
-        sub_id: sub_id[1],
-        status: 1
-      })
+
+      if (this.postStatus == 0) {
+        // 当前是从 待发布页面进入 对帖子进行编辑，修改帖子内容即可
+        await postEdit({
+          title,
+          content,
+          time: moment().format('YYYY-MM-DD HH:mm:ss'),
+          sub_id: sub_id[1],
+          status: 1,
+          id: this.post_id
+        })
+      } else {
+        // 直接从发布帖子进入的页面，则直接添加新记录
+        await postPublish({
+          title,
+          content,
+          user_id: this.userInfo.id,
+          time: moment().format('YYYY-MM-DD HH:mm:ss'),
+          sub_id: sub_id[1],
+          status: 1
+        })
+      }
+      
       this.$message({
         message: '发布成功',
         type: 'success'
@@ -256,8 +285,8 @@ export default {
       await postEdit({
         title,
         content,
-        sub_id: Number(sub_id[1]),
-        id: Number(this.post_id)
+        sub_id: sub_id[1],
+        id: this.post_id
       })
       this.$message({
         message: '编辑成功',

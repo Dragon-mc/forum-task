@@ -68,7 +68,7 @@ export default {
   },
   mounted () {
     this.getShowUserInfo()
-    if (JSON.parse(getUserInfo() || '{}').id != this.$route.params.id) {
+    if (getUserInfo().id != this.$route.params.id) {
       this.prefix = 'Ta的'
     } else {
       this.self = true

@@ -24,6 +24,15 @@
           <div v-else class="btn at_btn" :class="{'no_atte': false}" @click="handleAttention(index)">关注TA</div>
         </el-col>
       </el-row>
+      <div class="pagination" v-if="total > paginationData.limit">
+        <el-pagination
+          @current-change="handleCurrentChange"
+          :current-page="paginationData.page"
+          :page-size="paginationData.limit" 
+          layout="total, prev, pager, next, jumper"
+          :total="total">
+        </el-pagination>
+      </div>
     </div>
   </div>
 </template>
@@ -39,11 +48,16 @@ export default {
     return {
       attentionList: [],
       visit_id: undefined,
-      prefix: '我'
+      prefix: '我',
+      total: 0,
+      paginationData: {
+        limit: 10,
+        page: 1
+      }
     }
   },
   mounted () {
-    this.visit_id = JSON.parse(getUserInfo() || '{}').id || 0
+    this.visit_id = getUserInfo().id || 0
     this.getAttentionList()
     if (this.visit_id != this.$route.params.id)
         this.prefix = 'Ta'
@@ -51,8 +65,12 @@ export default {
   methods: {
     // 获取关注列表
     async getAttentionList () {
-      let res = await fetchAttention({id: this.$route.params.id, visit_id: this.visit_id})
-      this.attentionList = res.data
+      const data = Object.assign({}, this.paginationData)
+      data.id = this.$route.params.id
+      data.visit_id = this.visit_id
+      let res = await fetchAttention(data)
+      this.attentionList = res.data.items
+      this.total = res.data.total
     },
 
     // 取消关注
@@ -87,7 +105,13 @@ export default {
         return false
       }
       return true
+    },
+
+    handleCurrentChange (page) {
+      this.paginationData.page = page
+      this.getAttentionList()
     }
+
   }
 }
 </script>
@@ -176,6 +200,16 @@ export default {
           }
         }
       }
+
+      .pagination {
+        .el-pagination {
+          display: flex;
+          justify-content: center;
+          align-items: center;
+          margin-top: 15px;
+        }
+      }
+
     }
   }
 </style>

@@ -17,10 +17,5 @@ export function isLogin () {
 
 // 获取用户信息
 export function getUserInfo () {
-	return Cookies.get('forum-user')
-}
-
-// 获取当前查看用户信息
-export function nowUserInfo () {
-	return Cookies.get('forum-now-user')
+	return JSON.parse(Cookies.get('forum-user') || '{}')
 }

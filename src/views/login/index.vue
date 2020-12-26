@@ -87,12 +87,12 @@
       <el-button :loading="loading" type="primary" style="width:100%;margin-bottom:30px;" @click.native.prevent="handleLogin">登录</el-button>
 
       <div style="position:relative">
-        <el-button type="primary">
-          注册账户
-        </el-button>
-        <el-button class="thirdparty-button" type="primary">
-          忘记密码？
-        </el-button>
+        <div class="slot"></div>
+        <router-link to="/register">
+          <el-button class="thirdparty-button" type="primary" >
+            注册账户
+          </el-button>
+        </router-link>
       </div>
     </el-form>
 
@@ -261,6 +261,10 @@ $light_gray:#eee;
     color: $dark_gray;
     cursor: pointer;
     user-select: none;
+  }
+
+  .slot {
+    height: 32px;
   }
 
   .thirdparty-button {

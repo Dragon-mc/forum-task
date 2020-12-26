@@ -3,11 +3,16 @@
     <div class="header_fixed">
       <div class="header_inner my-container">
         <div class="logo">
-          <img src="../assets/logo.png" alt="forum" title="forum">
+          <h1>
+            <router-link to="/index"><img src="../assets/logo.png" alt="forum" title="forum"></router-link>
+          </h1>
+          <h2>
+            <router-link to="/index">Forum</router-link>
+          </h2>
         </div>
         <ul class="navigator hidden-sm-and-down">
-          <li @mouseenter="handleInNav(0)" @mouseleave="handleOutNav"><router-link :target="index==0?'':'_blank'" to="/index" title="首页">首页</router-link></li>
-          <li @mouseenter="handleInNav(1)" @mouseleave="handleOutNav"><router-link :target="index==1?'':'_blank'" to="/cate" title="分类">分类</router-link></li>
+          <li @mouseenter="handleInNav(0)" @mouseleave="handleOutNav"><router-link to="/index" title="首页">首页</router-link></li>
+          <li @mouseenter="handleInNav(1)" @mouseleave="handleOutNav"><router-link to="/cate" title="分类">分类</router-link></li>
           <li @mouseenter="handleInNav(2)" @mouseleave="handleOutNav"><a href="javascript:;" title="个人中心" @click="handleToUserCenter">个人中心</a></li>
           <div class="indicator" :style="{transform: `translateX(${indicatorIndex*70}px)`, width: indicatorWidth*hasIndicator+'px'}"></div>
         </ul>
@@ -58,8 +63,7 @@ export default {
     }
   },
   mounted () {
-    let userInfo = getUserInfo() || '{}'
-    this.userInfo = JSON.parse(userInfo)
+    this.userInfo = getUserInfo()
     this.login = isLogin()
 
     if (this.index == -1) {
@@ -99,10 +103,10 @@ export default {
         })
         return
       }
-      let route = this.$router.resolve({
+      let route = this.$router.push({
         path: `/uc/${this.userInfo.id}`
       })
-      window.open(route.href, this.index==2?'_self':'_blank')
+      // window.open(route.href, this.index==2?'_self':'_blank')
     },
 
     // 点击发帖
@@ -155,9 +159,15 @@ export default {
         align-items: center;
 
         .logo {
-          height: 45px;
-          img {
-            height: 45px;
+          height: 30px;
+          h1 {
+            height: 100%;
+            img {
+              height: 100%;
+            }
+          }
+          h2 {
+            display: none;
           }
         }
 

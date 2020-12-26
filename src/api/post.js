@@ -32,6 +32,14 @@ export function reply (data) {
   })
 }
 
+export function deletePost (data) {
+  return request({
+    url: '/front/post/deletePost',
+    method: 'post',
+    data
+  })
+}
+
 // 发布帖子时 上传推片
 export function uploadImg (data) {
   return request({

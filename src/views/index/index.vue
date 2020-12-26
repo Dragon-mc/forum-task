@@ -66,7 +66,7 @@
               <div class="browse_rank rank_list">
                 <div class="rank_title">
                   <span class="txt">浏览排行</span>
-                  <el-tag size="small">查看更多</el-tag>
+                  <router-link :to="{name: 'browse_rank', params: {index: 0}}"><el-tag size="small">查看更多</el-tag></router-link>
                 </div>
                 <el-row class="browse_list" :gutter="24">
                   <el-col v-for="item in browseRank" :key="item.id" class="browse_item" :xs="12" :sm="12" :md="24" :lg="24">
@@ -86,7 +86,7 @@
               <div class="comment_rank rank_list">
                 <div class="rank_title">
                   <span class="txt">评论排行</span>
-                  <el-tag size="small">查看更多</el-tag>
+                  <router-link :to="{name: 'comment_rank', params: {index: 1}}"><el-tag size="small">查看更多</el-tag></router-link>
                 </div>
                 <el-row class="comment_list" :gutter="24">
                   <el-col v-for="item in commentRank" :key="item.post_id" class="comment_item" :xs="12" :sm="12" :md="24" :lg="24">
@@ -112,7 +112,7 @@
               <div class="attention_rank rank_list">
                 <div class="rank_title">
                   <span class="txt">关注排行</span>
-                  <el-tag size="small">查看更多</el-tag>
+                  <router-link :to="{name: 'attention_rank', params: {index: 2}}"><el-tag size="small">查看更多</el-tag></router-link>
                 </div>
                 <el-row class="attention_list" :gutter="24">
                   <el-col v-for="item in attentionRank" :key="item.passive_id" class="attention_item" :xs="12" :sm="12" :md="24" :lg="24">
@@ -124,7 +124,7 @@
                             {{item.user_info.nickname || item.user_info.username}}
                           </div>
                           <div class="attention_num">
-                            被关注 {{item.passive_attention_num}}
+                            粉丝 {{item.passive_attention_num}}
                           </div>
                         </div>
                       <!-- </el-row> -->
@@ -163,8 +163,7 @@ export default {
     }
   },
   mounted () {
-    let userInfo = getUserInfo() || '{}'
-    this.userInfo = JSON.parse(userInfo)
+    this.userInfo = getUserInfo()
     this.getRecommendPostList()
     this.getRankList()
     this.getCateList()

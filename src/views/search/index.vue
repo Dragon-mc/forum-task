@@ -37,12 +37,12 @@
           </li>
           <div class="pagination">
             <el-pagination
-            @current-change="handleCurrentChange"
-            :current-page="currentPage"
-            :page-size="pageSize"
-            layout="total, prev, pager, next, jumper"
-            :total="total">
-          </el-pagination>
+              @current-change="handleCurrentChange"
+              :current-page="currentPage"
+              :page-size="pageSize"
+              layout="total, prev, pager, next, jumper"
+              :total="total">
+            </el-pagination>
           </div>
         </ul>
       </div>

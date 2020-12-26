@@ -32,9 +32,11 @@
               <li><router-link :to="{name: 'profile', params: {userInfo}}">{{prefix=='我'?'个人':'Ta的'}}资料</router-link></li>
               <li><router-link :to="`/uc/${nowUserId}/collection`">{{prefix}}收藏的</router-link></li>
               <li><router-link :to="`/uc/${nowUserId}/myPublish`">{{prefix}}发布的</router-link></li>
+              <li v-if="prefix=='我'"><router-link :to="`/uc/${nowUserId}/draft`">待发布</router-link></li>
               <li><router-link :to="`/uc/${nowUserId}/attention`">{{prefix}}关注的</router-link></li>
               <li><router-link :to="`/uc/${nowUserId}/fans`">{{prefix}}的粉丝</router-link></li>
               <li><router-link :to="`/uc/${nowUserId}/history`">浏览历史</router-link></li>
+              <li v-if="prefix=='我'"><router-link :to="`/uc/${nowUserId}/feedback`">意见反馈</router-link></li>
             </ul>
           </el-col>
           <el-col :span="21">
@@ -107,7 +109,7 @@ export default {
 
   async mounted () {
     // 获取路由中的id，保存为当前查看用户的id
-    this.visit_id = JSON.parse(getUserInfo() || '{}').id || 0
+    this.visit_id = getUserInfo().id || 0
     this.nowUserId = this.$route.params.id
     let res = await getUserCenterInfo({
       id: this.nowUserId,
@@ -202,7 +204,7 @@ export default {
 
       // 请求并返回成功数据后...
       let url = res.data.url
-      let myUserInfo = JSON.parse(getUserInfo() || '{}')
+      let myUserInfo = getUserInfo()
       myUserInfo.avatar = url
       // 修改cookies中用户的头像
       Cookies.set('forum-user', myUserInfo)

@@ -35,7 +35,7 @@
                     <router-link :to="`/post/${item.id}`" target="_blank"><i class="el-icon-view"></i>{{item.read_times}}</router-link>
                   </el-col>
                   <el-col :sm="12" :md="12" :lg="12" class="comment_num">
-                    <router-link :to="`/post/${item.id}`" target="_blank"><i class="el-icon-view"></i>{{item.comment_times}}</router-link>
+                    <router-link :to="`/post/${item.id}`" target="_blank"><i class="el-icon-chat-dot-round"></i>{{item.comment_times}}</router-link>
                   </el-col>
                 </el-row>
               </el-col>
@@ -45,6 +45,15 @@
             <i class="iconfont" :class="item.is_collection?'icon-collection-b':'icon-collection'" @click="handleCollectionOperate(item)"></i>
           </el-col>
         </el-row>
+      </div>
+      <div class="pagination" v-if="total > paginationData.limit">
+        <el-pagination
+          @current-change="handleCurrentChange"
+          :current-page="paginationData.page"
+          :page-size="paginationData.limit" 
+          layout="total, prev, pager, next, jumper"
+          :total="total">
+        </el-pagination>
       </div>
     </div>
   </div>
@@ -62,8 +71,13 @@ export default {
     return {
       collectionList: [],
       prefix: '我',
-      // 观看者id，即自己的id
-      visit_id: undefined
+      // 观看者id，即浏览用户的id
+      visit_id: undefined,
+      total: 0,
+      paginationData: {
+        limit: 5,
+        page: 1
+      }
     }
   },
   filters: {
@@ -72,7 +86,7 @@ export default {
     }
   },
   mounted () {
-    this.visit_id = JSON.parse(getUserInfo() || '{}').id || 0
+    this.visit_id = getUserInfo().id || 0
     this.getCollectionList()
     if (this.visit_id != this.$route.params.id)
       this.prefix = 'Ta'
@@ -80,11 +94,12 @@ export default {
   methods: {
     // 获取收藏列表
     async getCollectionList () {
-      let res = await fetchCollection({
-        id: this.$route.params.id,
-        visit_id: this.visit_id
-      })
-      this.collectionList = res.data
+      const data = Object.assign({}, this.paginationData)
+      data.id = this.$route.params.id
+      data.visit_id = this.visit_id
+      let res = await fetchCollection(data)
+      this.collectionList = res.data.items
+      this.total = res.data.total
     },
 
     // 处理收藏点击
@@ -118,7 +133,13 @@ export default {
         message,
         type: 'success'
       })
+    },
+
+    handleCurrentChange (page) {
+      this.paginationData.page = page
+      this.getCollectionList()
     }
+
   }
 }
 </script>
@@ -243,6 +264,16 @@ export default {
           }
         }
       }
+
+      .pagination {
+        .el-pagination {
+          display: flex;
+          justify-content: center;
+          align-items: center;
+          margin-top: 20px;
+        }
+      }
+
     }
   }
 </style>

@@ -158,7 +158,7 @@ export default {
     }
   },
   mounted () {
-    this.selfInfo = JSON.parse(getUserInfo() || '{}')
+    this.selfInfo = getUserInfo()
     this.getPostInfo()
     this.getCommentInfo()
     this.setHistory()
