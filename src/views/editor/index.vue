@@ -161,7 +161,7 @@ export default {
       let height = window.innerHeight
       this.mce.style.setProperty('height', height-55+'px', 'important')
     }
-    this.userInfo = JSON.parse(getUserInfo() || {})
+    this.userInfo = JSON.parse(getUserInfo() || '{}')
     this.getCategoryOptions()
     
     // 如果是编辑则将编辑数据赋值到当前页面中

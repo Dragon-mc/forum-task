@@ -19,7 +19,7 @@
           </router-link>
         </el-col>
         <el-col :xs="6" :sm="4" :md="2" :lg="2" class="attention">
-          <div v-if="selfId==item.id" class="btn at_btn">自己</div>
+          <div v-if="visit_id==item.id" class="btn at_btn">自己</div>
           <div v-else-if="item.is_attention" class="btn" :class="{'no_atte': false}" @click="handleCancelAttention(index)">取消关注</div>
           <div v-else class="btn at_btn" :class="{'no_atte': false}" @click="handleAttention(index)">关注TA</div>
         </el-col>
@@ -38,27 +38,28 @@ export default {
   data () {
     return {
       attentionList: [],
-      selfId: undefined,
+      visit_id: undefined,
       prefix: '我'
     }
   },
   mounted () {
-    this.selfId = JSON.parse(getUserInfo()).id
+    this.visit_id = JSON.parse(getUserInfo() || '{}').id || 0
     this.getFansList()
 
-    if (this.selfId != this.$route.params.id)
+    if (this.visit_id != this.$route.params.id)
         this.prefix = 'Ta'
   },
   methods: {
     // 获取粉丝列表
     async getFansList () {
-      let res = await fetchFans({id: this.$route.params.id, selfId: this.selfId})
+      let res = await fetchFans({id: this.$route.params.id, visit_id: this.visit_id})
       this.attentionList = res.data
     },
 
     // 取消关注
     async handleCancelAttention (index) {
-      await cancelAttention({active_id: this.selfId, passive_id: this.attentionList[index].id})
+      if (!this.checkLogin()) return
+      await cancelAttention({active_id: this.visit_id, passive_id: this.attentionList[index].id})
       this.$message({
         message: '取消关注',
         type: 'success'
@@ -68,12 +69,25 @@ export default {
 
     // 关注
     async handleAttention (index) {
-      await attention({active_id: this.selfId, passive_id: this.attentionList[index].id, time: moment().format('YYYY-MM-DD HH:mm:ss')})
+      if (!this.checkLogin()) return
+      await attention({active_id: this.visit_id, passive_id: this.attentionList[index].id, time: moment().format('YYYY-MM-DD HH:mm:ss')})
       this.$message({
         message: '关注成功！',
         type: 'success'
       })
       this.attentionList[index].is_attention = true
+    },
+
+    //检查登录
+    checkLogin () {
+      if (this.visit_id == 0) {
+        this.$message({
+          message: '请登录后操作！',
+          type: 'error'
+        })
+        return false
+      }
+      return true
     }
   }
 }

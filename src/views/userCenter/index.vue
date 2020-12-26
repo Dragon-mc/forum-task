@@ -107,7 +107,7 @@ export default {
 
   async mounted () {
     // 获取路由中的id，保存为当前查看用户的id
-    this.visit_id = JSON.parse(getUserInfo() || {}).id
+    this.visit_id = JSON.parse(getUserInfo() || '{}').id || 0
     this.nowUserId = this.$route.params.id
     let res = await getUserCenterInfo({
       id: this.nowUserId,
@@ -202,7 +202,7 @@ export default {
 
       // 请求并返回成功数据后...
       let url = res.data.url
-      let myUserInfo = JSON.parse(getUserInfo())
+      let myUserInfo = JSON.parse(getUserInfo() || '{}')
       myUserInfo.avatar = url
       // 修改cookies中用户的头像
       Cookies.set('forum-user', myUserInfo)
@@ -218,6 +218,13 @@ export default {
 
     // 关注和取消关注用户
     async handleAttentionOperate () {
+      if (this.visit_id == 0) {
+        this.$message({
+          message: '请登录后操作！',
+          type: 'error'
+        })
+        return
+      }
       let message = ''
       if (this.userInfo.is_attention) {
         // 取消关注

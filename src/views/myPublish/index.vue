@@ -59,7 +59,7 @@ export default {
   },
   mounted () {
     this.getPublishList()
-    if (JSON.parse(getUserInfo()).id != this.$route.params.id)
+    if (JSON.parse(getUserInfo() || '{}').id != this.$route.params.id)
       this.prefix = 'Ta'
     else
       this.self = true

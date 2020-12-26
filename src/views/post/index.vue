@@ -35,8 +35,11 @@
             <div class="post_info">
               <div class="time">{{postInfo.time}}</div>
               <div class="read_times"><i class="el-icon-view"></i>{{postInfo.read_times}}</div>
-              <div class="collection_times"><i class="el-icon-chat-dot-round"></i>{{postInfo.comment_times}}</div>
+              <div class="comment_times"><i class="el-icon-chat-dot-round"></i>{{postInfo.comment_times}}</div>
               <div class="cate_tag">{{postInfo.cate_name}}</div>
+              <div class="collection_icon" @click="handleCollection">
+                <i class="iconfont" :class="postInfo.is_collection?'icon-collection-b':'icon-collection'"></i>{{postInfo.collection_times}}
+              </div>
             </div>
             <div class="title-box">
               <h1>{{postInfo.title}}</h1>
@@ -52,15 +55,22 @@
                 <img :src="selfInfo.avatar || '/static/img/photo.jpg'" alt="">
               </div>
               <div class="input">
-                <el-input v-model="commentContent" :placeholder="commentPlaceholder" @keyup.native.enter="handleComment"></el-input>
+                <el-input
+                  ref="commentInput"
+                  v-model="commentContent"
+                  :placeholder="commentPlaceholder"
+                  @keyup.native.enter="handleComment"
+                  @blur="handleCommentInputBlur"
+                  >
+                </el-input>
               </div>
               <div class="submit_btn">
                 <el-button @click="handleComment">评论</el-button>
               </div>
             </div>
-            <div class="no-content" v-if="false">暂无评论...</div>
+            <div class="no-content" v-if="!commentInfo.length">暂无评论...</div>
             <div class="comment_list">
-              <div class="comment_item" v-for="item in postInfo.comment_info" :key="item.id">
+              <div class="comment_item" v-for="item in commentInfo" :key="item.id">
                 <div class="comment_content_wrap">
                   <div class="user_avatar">
                     <router-link :to="`/uc/${item.user_id}`" target="_blank"><img :src="item.avatar || '/static/img/photo.jpg'" alt=""></router-link>
@@ -70,6 +80,8 @@
                   </div>
                   <div class="comment_content">
                      {{item.content}}
+                     <span class="time">{{item.time | fromNow}}</span>
+                     <span class="reply" @click="handleReply(item)">回复</span>
                   </div>
                 </div>
                 <div class="reply_list">
@@ -83,11 +95,22 @@
                         <router-link :to="`/uc/${item1.user_id}`" target="_blank">{{item1.nickname || item1.username}}&nbsp;回复<span class="reply_name">@{{item1.passive_nickname}}</span>：</router-link>
                         </div>
                       <div class="comment_content">
-                        我觉得你的评论很好，我也希望作者能写出更好的帖子
+                        {{item1.content}}
+                        <span class="time">{{item1.time | fromNow}}</span>
+                        <span class="reply" @click="handleReply(item1, item)">回复</span>
                       </div>
                     </div>
                   </div>
                 </div>
+              </div>
+              <div class="pagination" v-if="commentTotal > commentRequestData.limit">
+                <el-pagination
+                  @current-change="handleCurrentChange"
+                  :current-page="commentRequestData.currentPage"
+                  :page-size="commentRequestData.limit"
+                  layout="prev, pager, next"
+                  :total="commentTotal">
+                </el-pagination>
               </div>
             </div>
           </div>
@@ -100,10 +123,11 @@
 
 <script>
 import moment from 'moment'
+moment.locale('zh-ch')
 import comHeader from '@/components/comHeader'
 import comFooter from '@/components/comFooter'
-import { fetchPostInfo, comment } from '@/api/post'
-import { cancelAttention, attention } from '@/api/user'
+import { fetchPostInfo, fetchCommentInfo, comment, reply } from '@/api/post'
+import { cancelAttention, attention, collection, calcelCollection, history } from '@/api/user'
 import { getUserInfo } from '@/utils'
 
 export default {
@@ -111,21 +135,69 @@ export default {
     return {
       commentContent: '',
       commentPlaceholder: "请输入评论内容",
+      // 是否为回复状态，false表示当前是评论帖子的状态
+      reply: false,
+      // 帖子信息
       postInfo: {user_info: {}},
+      // 评论信息
+      commentInfo: [],
+      // 评论的总条数
+      commentTotal: 0,
+      // 当前评论的页数
+      currentPage: 1,
+      commentRequestData: {
+        limit: 3,
+        currentPage: 1
+      },
       selfInfo: {}
     }
   },
+  filters: {
+    fromNow (time) {
+      return moment(time).fromNow()
+    }
+  },
   mounted () {
-    this.selfInfo = JSON.parse(getUserInfo())
+    this.selfInfo = JSON.parse(getUserInfo() || '{}')
     this.getPostInfo()
+    this.getCommentInfo()
+    this.setHistory()
   },
   methods: {
+    // 获取帖子信息
     async getPostInfo () {
-      let res = await fetchPostInfo({id: this.$route.params.id, selfId: this.selfInfo.id})
+      let res = await fetchPostInfo({ id: this.$route.params.id, visit_id: this.selfInfo.id || 0 })
       this.postInfo = res.data
     },
+
+    // 获取评论信息
+    async getCommentInfo () {
+      const data = Object.assign({}, this.commentRequestData)
+      data.post_id = this.$route.params.id
+      let res = await fetchCommentInfo(data)
+      this.commentInfo = res.data.items
+      this.commentTotal = res.data.total
+    },
+
+    // 设置浏览历史
+    async setHistory () {
+      if (!this.selfInfo.id) return
+      let res = await history({
+        user_id: this.selfInfo.id,
+        post_id: this.$route.params.id,
+        time: moment().format('YYYY-MM-DD HH:mm:ss')
+      })
+    },
+
+    // 评论页码改变
+    handleCurrentChange (page) {
+      this.commentRequestData.currentPage = page
+      this.getCommentInfo()
+    },
+
     // 点击评论
     async handleComment () {
+      if (!this.checkLogin()) return
       if (this.commentContent.trim() == '') {
         this.$message({
           message: '请输入评论内容！',
@@ -133,17 +205,37 @@ export default {
         })
         return
       }
-      await comment({
-        user_id: this.selfInfo.id,
-        post_id: this.postInfo.id,
-        content: this.commentContent,
-        time: moment().format('YYYY-MM-DD HH:mm:ss')
-      })
-      this.$message({
-        message: '评论成功',
-        type: 'success'
-      })
-      this.getPostInfo()
+      if (!reply) {
+        // 当前为评论状态
+        await comment({
+          user_id: this.selfInfo.id,
+          post_id: this.postInfo.id,
+          content: this.commentContent,
+          time: moment().format('YYYY-MM-DD HH:mm:ss')
+        })
+        this.$message({
+          message: '评论成功',
+          type: 'success'
+        })
+      } else {
+        // 当前为回复状态
+        const data = Object.assign({}, this.replyCreateData)
+        data.content = this.commentContent
+        await reply(data)
+        this.$message({
+          message: '回复成功',
+          type: 'success'
+        })
+      }
+      // 重新获取评论列表，刷新评论列表
+      this.getCommentInfo()
+    },
+
+    // 评论输入框失焦
+    handleCommentInputBlur () {
+      this.commentPlaceholder = '请输入评论内容'
+      // 失焦则将状态恢复成默认状态 即评论状态
+      this.reply = false
     },
 
     // 取消关注
@@ -155,15 +247,75 @@ export default {
       })
       this.postInfo.user_info.is_attention = false
     },
-
+    
     // 关注
     async handleAttention () {
+      if (!this.checkLogin()) return
       await attention({active_id: this.selfInfo.id, passive_id: this.postInfo.user_id, time: moment().format('YYYY-MM-DD HH:mm:ss')})
       this.$message({
         message: '关注成功！',
         type: 'success'
       })
       this.postInfo.user_info.is_attention = true
+    },
+
+    // 回复
+    handleReply (item, comment_item) {
+      if (!this.checkLogin()) return
+      this.commentPlaceholder = '回复@' + item.nickname || item.username
+      // 使评论输入框聚焦
+      this.$refs.commentInput.focus()
+      // 改变当前的状态为 回复状态
+      this.reply = true
+      const data = {}
+      data.passive_user_id = item.user_id
+      // 如果存在评论的对象，则使用评论对象中的id，表示当前是点击回复内容后面 回复按钮进入的函数
+      data.comment_id = comment_item ? comment_item.id : item.id
+      data.user_id = this.selfInfo.id
+      data.time = moment().format('YYYY-MM-DD HH:mm:ss')
+      this.replyCreateData = data
+      // 初始化完回复的基本数据
+    },
+
+    // 收藏
+    async handleCollection () {
+      if (!this.checkLogin()) return
+      let message = ''
+      if (this.postInfo.is_collection) {
+        // 取消收藏
+        await calcelCollection({
+          post_id: this.postInfo.id,
+          user_id: this.selfInfo.id
+        })
+        message = '取消收藏'
+        this.postInfo.collection_times--
+      } else {
+        // 收藏
+        await collection({
+          post_id: this.postInfo.id,
+          user_id: this.selfInfo.id,
+          time: moment().format('YYYY-MM-DD HH:mm:ss')
+        })
+        message = '收藏成功'
+        this.postInfo.collection_times++
+      }
+      this.postInfo.is_collection = !this.postInfo.is_collection
+      this.$message({
+        message,
+        type: 'success'
+      })
+    },
+
+    // 检查是否登录
+    checkLogin () {
+      if (!this.selfInfo.id) {
+        this.$message({
+          message: '请登录后操作！',
+          type: 'error'
+        })
+        return false
+      }
+      return true
     }
   },
   components: {
@@ -284,7 +436,7 @@ export default {
             display: flex;
             align-items: center;
           }
-          .collection_times {
+          .comment_times {
             margin-left: 20px;
             display: flex;
             align-items: center;
@@ -297,6 +449,19 @@ export default {
             border-radius: 5px;
             border: 1px solid #eaeaef;
             font-size: 12px;
+          }
+          .collection_icon {
+            margin-left: 30px;
+            cursor: pointer;
+            .icon-collection-b {
+              color: rgb(255,204,118);
+            }
+            &:hover {
+              color: #409EFF;
+              .icon-collection {
+                color: #409EFF;
+              }
+            }
           }
           i {
             font-size: 18px;
@@ -353,7 +518,7 @@ export default {
           justify-content: center;
           align-items: center;
           color: #999aaa;
-          margin-top: 10px;
+          margin-top: 20px;
           font-size: 16px;
         }
         .comment_list {
@@ -380,6 +545,19 @@ export default {
                 padding-left: 5px;
                 color: #222226;
                 line-height: 24px;
+                .time {
+                  font-size: 12px;
+                  color: #6B6B6B;
+                  padding-left: 12px;
+                }
+                .reply {
+                  color: #409EFF;
+                  padding-left: 10px;
+                  cursor: pointer;
+                  &:hover {
+                    color: #fc5531;
+                  }
+                }
               }
             }
             .comment_content_wrap {
@@ -405,6 +583,16 @@ export default {
               }
             }
           }
+
+          .pagination {
+            .el-pagination {
+              display: flex;
+              justify-content: center;
+              align-items: center;
+              padding: 20px 0 0 0;
+            }
+          }
+
         }
       }
     }

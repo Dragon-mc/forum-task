@@ -47,3 +47,11 @@ export function collection (data) {
     data
   })
 }
+
+export function history (data) {
+  return request({
+    url: '/front/user/history',
+    method: 'post',
+    data
+  })
+}

@@ -72,7 +72,7 @@ export default {
     }
   },
   mounted () {
-    this.visit_id = JSON.parse(getUserInfo() || {}).id
+    this.visit_id = JSON.parse(getUserInfo() || '{}').id || 0
     this.getCollectionList()
     if (this.visit_id != this.$route.params.id)
       this.prefix = 'Ta'
@@ -89,6 +89,13 @@ export default {
 
     // 处理收藏点击
     async handleCollectionOperate (item) {
+      if (this.visit_id == 0) {
+        this.$message({
+          message: '请登录后操作！',
+          type: 'error'
+        })
+        return
+      }
       let message = ''
       if (item.is_collection) {
         // 取消收藏
