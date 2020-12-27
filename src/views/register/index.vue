@@ -129,7 +129,7 @@
 <script>
 import Cookies from 'js-cookie'
 import moment from 'moment'
-import { getVerifyCode, freeCache, checkUserExist } from '@/api/register'
+import { getVerifyCode, checkUserExist } from '@/api/register' // , freeCache
 import { register } from '@/api/user'
 import { guid } from '@/utils/index'
 
@@ -137,7 +137,8 @@ export default {
   data () {
     const validateUsername = async (rule, value, callback) => {
       // 发送请求，检验用户名是否存在
-      let res = await checkUserExist({username: this.registerForm.username})
+      let res = {}
+      if (value.trim() !== '') res = await checkUserExist({username: this.registerForm.username})
       // .then(res => {
       //   if (res.data) {
       //     callback(new Error('用户名已存在'))
@@ -151,7 +152,7 @@ export default {
       }
     }
     const validatePassword = (rule, value, callback) => {
-      let reg = /^[0-9A-z`~!@#$%^&*()_+-=/\\[]{};':",.<>?]{8,20}$/
+      let reg = /^[0-9A-z`~!@#$%^&*()_+-=\/\\\[\]\{\};':",.<>?]{8,20}$/
       if (value.length < 8 || value.length > 20) {
         callback(new Error('密码长度最少8位，不超过20位'))
       } else if (!reg.test(value)) {
@@ -194,14 +195,14 @@ export default {
     }
 
     // 对之前在服务器的验证码数据进行释放
-    let token = Cookies.get('forum-verify-token')
-    if (token) {
-      freeCache({token})
-    }
+    // let token = Cookies.get('forum-verify-token')
+    // if (token) {
+    //   freeCache({token})
+    // }
 
     // 初始化时获取验证码
     this.registerForm.token = guid()
-    Cookies.set('forum-verify-token', this.registerForm.token)
+    // Cookies.set('forum-verify-token', this.registerForm.token)
     let res = await getVerifyCode({token: this.registerForm.token})
     this.verifyCodeSrc = res.data
   },

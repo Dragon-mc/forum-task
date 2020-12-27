@@ -10,7 +10,7 @@
             <div class="user_info">
               <div class="user_avatar">
                 <router-link :to="`/uc/${item.user_id}`" target="_blank">
-                  <img :src="item.avatar || '/static/img/photo.jpg'" alt="">
+                  <img :src="item.avatar || './static/img/photo.jpg'" alt="">
                 </router-link>
               </div>
               <div class="user_name">

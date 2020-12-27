@@ -7,7 +7,7 @@
           <div class="author_info">
             <el-row>
               <el-col :xs="4" :sm="3" :md="8" :lg="8" class="author_avatar">
-                <router-link :to="`/uc/${postInfo.user_info.id}`" target="_blank"><img :src="postInfo.user_info.avatar || '/static/img/photo.jpg'" alt=""></router-link>
+                <router-link :to="`/uc/${postInfo.user_info.id}`" target="_blank"><img :src="postInfo.user_info.avatar || './static/img/photo.jpg'" alt=""></router-link>
               </el-col>
               <el-col :xs="5" :sm="4" :md="16" :lg="16" class="author_name">
                 <router-link :to="`/uc/${postInfo.user_info.id}`" target="_blank">{{postInfo.user_info.nickname || postInfo.user_info.username}}</router-link>
@@ -52,7 +52,7 @@
             <div class="title">评论区</div>
             <div class="my_comment_wrap">
               <div class="my_avatar">
-                <img :src="selfInfo.avatar || '/static/img/photo.jpg'" alt="">
+                <img :src="selfInfo.avatar || './static/img/photo.jpg'" alt="">
               </div>
               <div class="input">
                 <el-input
@@ -73,7 +73,7 @@
               <div class="comment_item" v-for="item in commentInfo" :key="item.id">
                 <div class="comment_content_wrap">
                   <div class="user_avatar">
-                    <router-link :to="`/uc/${item.user_id}`" target="_blank"><img :src="item.avatar || '/static/img/photo.jpg'" alt=""></router-link>
+                    <router-link :to="`/uc/${item.user_id}`" target="_blank"><img :src="item.avatar || './static/img/photo.jpg'" alt=""></router-link>
                   </div>
                   <div class="user_name">
                     <router-link :to="`/uc/${item.user_id}`" target="_blank">{{item.nickname || item.username}}：</router-link>
@@ -89,7 +89,7 @@
                   <div class="reply_item_wrap">
                     <div class="reply_item" v-for="item1 in item.reply_info" :key="item1.id">
                       <div class="user_avatar">
-                        <router-link :to="`/uc/${item1.user_id}`" target="_blank"><img :src="item1.avatar || '/static/img/photo.jpg'" alt=""></router-link>
+                        <router-link :to="`/uc/${item1.user_id}`" target="_blank"><img :src="item1.avatar || './static/img/photo.jpg'" alt=""></router-link>
                       </div>
                       <div class="user_name">
                         <router-link :to="`/uc/${item1.user_id}`" target="_blank">{{item1.nickname || item1.username}}&nbsp;回复<span class="reply_name">@{{item1.passive_nickname}}</span>：</router-link>

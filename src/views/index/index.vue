@@ -43,7 +43,7 @@
                         </div>
                       <div class="list_user_bar">
                         <router-link :to="`/uc/${item.user_id}`" target="_blank" class="user">
-                          <img :src="item.avatar || '/static/img/photo.jpg'" alt="avatar">
+                          <img :src="item.avatar || './static/img/photo.jpg'" alt="avatar">
                           <div class="name">
                             {{item.nickname || item.username}}
                           </div>
@@ -72,7 +72,7 @@
                   <el-col v-for="item in browseRank" :key="item.id" class="browse_item" :xs="12" :sm="12" :md="24" :lg="24">
                     <router-link :to="`/post/${item.id}`" target="_blank">
                       <el-row :gutter="12">
-                        <el-col :span="6"><img :src="item.avatar || '/static/img/photo.jpg'" alt=""></el-col>
+                        <el-col :span="6"><img :src="item.avatar || './static/img/photo.jpg'" alt=""></el-col>
                         <el-col :span="18">
                           <div class="title">
                             {{item.title}}
@@ -92,7 +92,7 @@
                   <el-col v-for="item in commentRank" :key="item.post_id" class="comment_item" :xs="12" :sm="12" :md="24" :lg="24">
                     <router-link :to="`/post/${item.post_id}`" target="_blank">
                       <el-row class="user" :gutter="4">
-                        <el-col :span="5"><img :src="item.details.avatar || '/static/img/photo.jpg'" alt="" class="responsive_img"></el-col>
+                        <el-col :span="5"><img :src="item.details.avatar || './static/img/photo.jpg'" alt="" class="responsive_img"></el-col>
                         <el-col :span="14" class="user_info">
                           <div class="name">{{item.details.nickname || item.details.username}}</div>
                           <div class="sign">{{item.details.sign || '这个人太懒了，什么都没留下'}}</div>
@@ -118,7 +118,7 @@
                   <el-col v-for="item in attentionRank" :key="item.passive_id" class="attention_item" :xs="12" :sm="12" :md="24" :lg="24">
                     <router-link :to="`/uc/${item.passive_id}`" target="_blank">
                       <!-- <el-row :gutter="12"> -->
-                        <div><img :src="item.user_info.avatar || '/static/img/photo.jpg'" alt=""></div>
+                        <div><img :src="item.user_info.avatar || './static/img/photo.jpg'" alt=""></div>
                         <div class="info">
                           <div class="name">
                             {{item.user_info.nickname || item.user_info.username}}

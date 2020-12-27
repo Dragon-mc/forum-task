@@ -11,7 +11,7 @@
             trigger="hover"
           >
             <div class="dep_wrap">
-              <div class="dep_item"><img src="../assets/logo.png" alt=""><span>Vue.js</span></div>
+              <div class="dep_item"><img src="../assets/vue.png" alt=""><span>Vue.js</span></div>
               <div class="dep_item"><img src="../assets/axios.png" alt=""><span>Axios.js</span></div>
               <div class="dep_item"><img src="../assets/moment.png" alt=""><span>Moment.js</span></div>
               <div class="dep_item"><img src="../assets/element.png" alt=""><span>Element-ui</span></div>

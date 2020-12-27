@@ -5,7 +5,7 @@
       <div class="inner my-container">
         <div class="left_info_wrap">
           <div class="user_avatar">
-            <img :src="userInfo.avatar || '/static/img/photo.jpg'" alt="avatar">
+            <img :src="userInfo.avatar || './static/img/photo.jpg'" alt="avatar">
             <p v-if="self" class="modify_img" @click="handleUploadAvatar">上传头像</p>
           </div>
           <div class="user_info">

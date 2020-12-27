@@ -100,7 +100,7 @@
 
 <script>
 import Cookies from 'js-cookie'
-import { getVerifyCode, freeCache } from '@/api/register'
+import { getVerifyCode } from '@/api/register' // , freeCache
 import { login } from '@/api/user'
 import { guid } from '@/utils/index'
 
@@ -153,14 +153,14 @@ export default {
     }
 
     // 对之前在服务器的验证码数据进行释放
-    let token = Cookies.get('forum-verify-token')
-    if (token) {
-      freeCache({token})
-    }
+    // let token = Cookies.get('forum-verify-token')
+    // if (token) {
+    //   freeCache({token})
+    // }
 
     // 初始化时获取验证码
     this.loginForm.token = guid()
-    Cookies.set('forum-verify-token', this.loginForm.token)
+    // Cookies.set('forum-verify-token', this.loginForm.token)
     let res = await getVerifyCode({token: this.loginForm.token})
     this.verifyCodeSrc = res.data
   },

@@ -23,7 +23,7 @@
         <a href="javascript:;" @click="handleEdit"><el-button type="primary" size="mini" icon="el-icon-edit" round class="hidden-xs-only">发帖</el-button></a>
         <div class="right_wrap">
           <el-dropdown v-if="login">
-            <router-link :to="`/uc/${userInfo.id}`"><img class="avatar" :src="userInfo.avatar || '/static/img/photo.jpg'"></router-link>
+            <router-link :to="`/uc/${userInfo.id}`"><img class="avatar" :src="userInfo.avatar || './static/img/photo.jpg'"></router-link>
             <el-dropdown-menu slot="dropdown">
               <el-dropdown-item><router-link :to="`/uc/${userInfo.id}`"><i class="el-icon-user-solid"></i>个人中心</router-link></el-dropdown-item>
               <el-dropdown-item><i class="el-icon-s-tools"></i>用户设置</el-dropdown-item>

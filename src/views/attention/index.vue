@@ -7,7 +7,7 @@
       <el-row class="attention_item" v-for="(item, index) in attentionList" :key="item.id">
         <el-col :xs="5" :sm="3" :md="2" :lg="2" class="avatar">
           <router-link :to="`/uc/${item.id}`" target="_blank">
-            <img :src="item.avatar || '/static/img/photo.jpg'" alt="">
+            <img :src="item.avatar || './static/img/photo.jpg'" alt="">
           </router-link>
         </el-col>
         <el-col :xs="13" :sm="17" :md="20" :lg="20" class="name_sign">

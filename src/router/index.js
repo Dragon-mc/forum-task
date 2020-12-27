@@ -23,8 +23,14 @@ import attentionRank from '@/views/rank/attention-rank'
 
 Vue.use(Router)
 
+const base = {
+  'development': '/',
+  'production': '/php2/forum/'
+}[process.env.NODE_ENV]
+
 export default new Router({
-  mode: 'history',
+  // mode: 'history',
+  base: base,
   routes: [
     {
       path: '/',

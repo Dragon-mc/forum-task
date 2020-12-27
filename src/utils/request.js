@@ -6,7 +6,9 @@ import { Message } from 'element-ui'
 const http = axios.create({
   baseURL: process.env.VUE_APP_BASE_API,
   timeout: 5000, // request timeout
-  headers: { 'content-type': 'application/x-www-form-urlencoded' }
+  headers: {
+    'content-type': 'application/x-www-form-urlencoded'
+  }
 })
 
 // 请求前的拦截器

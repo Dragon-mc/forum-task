@@ -19,7 +19,7 @@
                 </div>
               <div class="list_user_bar">
                 <router-link :to="`/uc/${item.user_id}`" target="_blank" class="user">
-                  <img :src="item.avatar || '/static/img/photo.jpg'" alt="avatar">
+                  <img :src="item.avatar || './static/img/photo.jpg'" alt="avatar">
                   <div class="name">
                     {{item.nickname || item.username}}
                   </div>

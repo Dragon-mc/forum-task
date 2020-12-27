@@ -28,7 +28,7 @@
         </template>
       </div>
       <div class="user_avatar">
-        <img :src="userInfo.avatar || '/static/img/photo.jpg'" alt="">
+        <img :src="userInfo.avatar || './static/img/photo.jpg'" alt="">
       </div>
     </div>
     <editor
