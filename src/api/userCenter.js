@@ -68,7 +68,7 @@ export function uploadAvatar (data) {
   return request({
     url: '/front/userCenter/uploadAvatar',
     method: 'post',
-    headers: {'Content-Type':'multipart/form-data'},
+    headers: { 'Content-Type': 'multipart/form-data' },
     data
   })
 }

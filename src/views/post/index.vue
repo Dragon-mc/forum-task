@@ -123,18 +123,18 @@
 
 <script>
 import moment from 'moment'
-moment.locale('zh-ch')
-import comHeader from '@/components/comHeader'
-import comFooter from '@/components/comFooter'
 import { fetchPostInfo, fetchCommentInfo, comment, reply } from '@/api/post'
 import { cancelAttention, attention, collection, calcelCollection, history } from '@/api/user'
 import { getUserInfo } from '@/utils'
+import comHeader from '@/components/comHeader'
+import comFooter from '@/components/comFooter'
+moment.locale('zh-ch')
 
 export default {
   data () {
     return {
       commentContent: '',
-      commentPlaceholder: "请输入评论内容",
+      commentPlaceholder: '请输入评论内容',
       // 是否为回复状态，false表示当前是评论帖子的状态
       reply: false,
       // 帖子信息
@@ -182,7 +182,7 @@ export default {
     // 设置浏览历史
     async setHistory () {
       if (!this.selfInfo.id) return
-      let res = await history({
+      await history({
         user_id: this.selfInfo.id,
         post_id: this.$route.params.id,
         time: moment().format('YYYY-MM-DD HH:mm:ss')
@@ -198,7 +198,7 @@ export default {
     // 点击评论
     async handleComment () {
       if (!this.checkLogin()) return
-      if (this.commentContent.trim() == '') {
+      if (this.commentContent.trim() === '') {
         this.$message({
           message: '请输入评论内容！',
           type: 'error'
@@ -247,7 +247,6 @@ export default {
       })
       this.postInfo.user_info.is_attention = false
     },
-    
     // 关注
     async handleAttention () {
       if (!this.checkLogin()) return
@@ -260,7 +259,7 @@ export default {
     },
 
     // 回复
-    handleReply (item, comment_item) {
+    handleReply (item, commentItem) {
       if (!this.checkLogin()) return
       this.commentPlaceholder = '回复@' + item.nickname || item.username
       // 使评论输入框聚焦
@@ -270,7 +269,7 @@ export default {
       const data = {}
       data.passive_user_id = item.user_id
       // 如果存在评论的对象，则使用评论对象中的id，表示当前是点击回复内容后面 回复按钮进入的函数
-      data.comment_id = comment_item ? comment_item.id : item.id
+      data.comment_id = commentItem ? commentItem.id : item.id
       data.user_id = this.selfInfo.id
       data.time = moment().format('YYYY-MM-DD HH:mm:ss')
       this.replyCreateData = data

@@ -50,7 +50,6 @@
       </el-form-item>
 
       <el-form-item prop="password" class="input-wrap">
-        
         <el-input
           :key="passwordType"
           ref="password"
@@ -135,7 +134,7 @@ import { register } from '@/api/user'
 import { guid } from '@/utils/index'
 
 export default {
-  data() {
+  data () {
     const validateUsername = async (rule, value, callback) => {
       // 发送请求，检验用户名是否存在
       let res = await checkUserExist({username: this.registerForm.username})
@@ -152,7 +151,7 @@ export default {
       }
     }
     const validatePassword = (rule, value, callback) => {
-      let reg = /^[0-9A-z`~!@#$%^&*()_+-=\/\\\[\]\{\};':",.<>?]{8,20}$/
+      let reg = /^[0-9A-z`~!@#$%^&*()_+-=/\\[]{};':",.<>?]{8,20}$/
       if (value.length < 8 || value.length > 20) {
         callback(new Error('密码长度最少8位，不超过20位'))
       } else if (!reg.test(value)) {
@@ -162,7 +161,7 @@ export default {
       }
     }
     const validateRePassword = (rule, value, callback) => {
-      if (value != this.registerForm.password) {
+      if (value !== this.registerForm.password) {
         callback(new Error('两次密码不一致'))
       } else {
         callback()
@@ -179,7 +178,7 @@ export default {
       registerRules: {
         username: [{ required: true, trigger: 'blur', validator: validateUsername }],
         password: [{ required: true, trigger: 'blur', validator: validatePassword }],
-        rePassword: [{ required: true, trigger: 'blur', validator: validateRePassword }],
+        rePassword: [{ required: true, trigger: 'blur', validator: validateRePassword }]
       },
       passwordType: 'password',
       loading: false,
@@ -187,10 +186,7 @@ export default {
       usernameTimer: undefined
     }
   },
-  created() {
-    // window.addEventListener('storage', this.afterQRScan)
-  },
-  async mounted() {
+  async mounted () {
     if (this.registerForm.username === '') {
       this.$refs.username.focus()
     } else if (this.registerForm.password === '') {
@@ -208,13 +204,9 @@ export default {
     Cookies.set('forum-verify-token', this.registerForm.token)
     let res = await getVerifyCode({token: this.registerForm.token})
     this.verifyCodeSrc = res.data
-
-  },
-  destroyed() {
-    // window.removeEventListener('storage', this.afterQRScan)
   },
   methods: {
-    showPwd() {
+    showPwd () {
       if (this.passwordType === 'password') {
         this.passwordType = ''
       } else {
@@ -226,23 +218,21 @@ export default {
     },
 
     // 点击注册按钮
-    handleRegsiter() {
+    handleRegsiter () {
       this.$refs.registerForm.validate(valid => {
         if (valid) {
           this.loading = true
           const temp = Object.assign({}, this.registerForm)
           temp.create_time = moment().format('YYYY-MM-DD HH:mm:ss')
-          register(temp)
-          .then(() => {
+          register(temp).then(() => {
             this.$message({
               message: '注册成功！',
               type: 'success'
             })
             setTimeout(() => {
               this.$router.replace('/login')
-            }, 1000);
-          })
-          .catch(() => {
+            }, 1000)
+          }).catch(() => {
             this.loading = false
           })
         } else {
@@ -263,9 +253,7 @@ export default {
       // 实现防抖
       clearTimeout(this.usernameTimer)
       this.usernameTimer = setTimeout(() => {
-        this.$refs.registerForm.validateField('username',valid => {
-          
-        })
+        this.$refs.registerForm.validateField('username', valid => {})
       }, 1000)
     }
 

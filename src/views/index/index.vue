@@ -183,7 +183,7 @@ export default {
     // 获取推荐帖子信息
     async getRecommendPostList () {
       let res = await fetchRecommendPostList(this.requestData)
-      if (res.data.length == 0) {
+      if (res.data.length === 0) {
         this.hasMore = false
         this.$message({
           message: '没有更多数据',
@@ -207,12 +207,12 @@ export default {
       this.cateList = res.data
     },
 
-    scroll() {
+    scroll () {
       // 只有当页面时主页时，才检测滚动刷新
-      if (this.$route.path != '/index') return
-      //页面滚动高度
+      if (this.$route.path !== '/index') return
+      // 页面滚动高度
       let scroll = window.pageYOffset || document.documentElement.scrollTop || document.body.scrollTop
-      //窗口显示区高度
+      // 窗口显示区高度
       let windowHeight = window.innerHeight
       // 页面总高度
       let pageHeight = document.body.scrollHeight || document.documentElement.scrollHeight
@@ -228,7 +228,7 @@ export default {
               message: '没有更多数据',
               type: 'success',
               onClose: () => {
-                this.hasShowMessage = false 
+                this.hasShowMessage = false
               }
             })
           }
@@ -263,15 +263,11 @@ export default {
     background: rgb(245, 246, 247);
 
     .container_wrap {
-      // width: 1180px;
       padding: 12px 0;
       .ul_wrap {
         background: #fff;
         border-radius: 12px;
         .nav_cate_bar {
-          // width: 96px;
-          // margin-right: 12px;
-          
           li {
             a {
               display: block;
@@ -579,7 +575,6 @@ export default {
   .el-carousel__item:nth-child(2n) {
      background-color: #99a9bf;
   }
-  
   .el-carousel__item:nth-child(2n+1) {
      background-color: #d3dce6;
   }

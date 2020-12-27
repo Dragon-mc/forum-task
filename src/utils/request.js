@@ -4,7 +4,7 @@ import { Message } from 'element-ui'
 // axios.defaults.withCredentials = true
 // 创建axios实例
 const http = axios.create({
-  baseURL: 'http://www.forum.com/index.php', //http://www.forum.com
+  baseURL: process.env.VUE_APP_BASE_API,
   timeout: 5000, // request timeout
   headers: { 'content-type': 'application/x-www-form-urlencoded' }
 })
@@ -28,7 +28,7 @@ http.interceptors.response.use(
     const res = response.data
 
     // 前后端约定，信息正确的状态码返回20000，不正确则弹出错误信息
-    if (res.code != 20000) {
+    if (res.code !== 20000) {
       Message({
         message: res.message || 'Error',
         type: 'error',

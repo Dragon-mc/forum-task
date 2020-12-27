@@ -68,7 +68,7 @@ export default {
   },
   mounted () {
     this.getShowUserInfo()
-    if (getUserInfo().id != this.$route.params.id) {
+    if (Number(getUserInfo().id) !== Number(this.$route.params.id)) {
       this.prefix = 'Ta的'
     } else {
       this.self = true
@@ -95,14 +95,13 @@ export default {
       this.modifyProfile = false
       const data = Object.assign({}, this.userInfo)
       delete data['avatar']
-      let res = await modifyProfile(data)
+      await modifyProfile(data)
       this.$message({
         message: '信息修改成功',
         type: 'success'
       })
     }
   }
-  
 }
 </script>
 

@@ -105,9 +105,9 @@ export default {
       // 分类选择数组
       categoryOptions: [],
       editorInit: {
-        language_url: '/static/tinymce/zh_CN.js', //指定中文包
-        language: 'zh_CN',//中文
-        skin_url: '/static/tinymce/skins/ui/oxide',//编辑器皮肤，\
+        language_url: '/static/tinymce/zh_CN.js', // 指定中文包
+        language: 'zh_CN', // 中文
+        skin_url: '/static/tinymce/skins/ui/oxide', // 编辑器皮肤，\
         emoticons_database_url: '/static/tinymce/emojis.js',
         browser_spellcheck: true, // 拼写检查
         branding: false, // 去水印
@@ -117,10 +117,9 @@ export default {
         menubar: true, // 隐藏最上方menu
 
         plugins: 'print preview searchreplace autolink directionality visualblocks visualchars fullscreen image link media template code codesample table charmap hr pagebreak nonbreaking anchor insertdatetime advlist lists wordcount imagetools textpattern help emoticons autosave', // bdmap indent2em autoresize lineheight formatpainter axupimgs
-        toolbar: 'code undo redo restoredraft | cut copy paste pastetext | forecolor backcolor bold italic underline strikethrough link anchor | alignleft aligncenter alignright alignjustify outdent indent | \
-          styleselect formatselect fontselect fontsizeselect | bullist numlist | blockquote subscript superscript removeformat | \
-          table image media charmap emoticons codesample hr pagebreak insertdatetime print preview | fullscreen ', // | bdmap indent2em lineheight formatpainter axupimgs
-        height: 400, //编辑器高度
+        toolbar: 'code undo redo restoredraft | cut copy paste pastetext | forecolor backcolor bold italic underline strikethrough link anchor | alignleft aligncenter alignright alignjustify outdent indent | styleselect formatselect fontselect fontsizeselect | bullist numlist | blockquote subscript superscript removeformat | table image media charmap emoticons codesample hr pagebreak insertdatetime print preview | fullscreen ', // | bdmap indent2em lineheight formatpainter axupimgs
+        // 编辑器高度
+        height: 400,
         // min_height: 500,
         fontsize_formats: '12px 14px 16px 18px 24px 36px 48px 56px 72px',
         font_formats: '微软雅黑=Microsoft YaHei,Helvetica Neue,PingFang SC,sans-serif;苹果苹方=PingFang SC,Microsoft YaHei,sans-serif;宋体=simsun,serif;仿宋体=FangSong,serif;黑体=SimHei,sans-serif;Arial=arial,helvetica,sans-serif;Arial Black=arial black,avant garde;Book Antiqua=book antiqua,palatino;Comic Sans MS=comic sans ms,sans-serif;Courier New=courier new,courier;Georgia=georgia,palatino;Helvetica=helvetica;Impact=impact,chicago;Symbol=symbol;Tahoma=tahoma,arial,helvetica,sans-serif;Terminal=terminal,monaco;Times New Roman=times new roman,times;Verdana=verdana,geneva;Webdings=webdings;Wingdings=wingdings,zapf dingbats;知乎配置=BlinkMacSystemFont, Helvetica Neue, PingFang SC, Microsoft YaHei, Source Han Sans SC, Noto Sans CJK SC, WenQuanYi Micro Hei, sans-serif;小米配置=Helvetica Neue,Helvetica,Arial,Microsoft Yahei,Hiragino Sans GB,Heiti SC,WenQuanYi Micro Hei,sans-serif',
@@ -130,7 +129,7 @@ export default {
         init_instance_callback: () => {
           this.mce = document.querySelector('.tox-tinymce')
           let height = window.innerHeight
-          this.mce.style.setProperty('height', height-55+'px', 'important')
+          this.mce.style.setProperty('height', height - 55 + 'px', 'important')
         },
         // 自定义图片上传回调
         images_upload_handler: (blobInfo, succFun, failFun) => {
@@ -143,28 +142,24 @@ export default {
           // 上传图片
           const formData = new FormData()
           formData.append('file', file)
-          this.uploadImage(formData)
-          .then(res => {
+          this.uploadImage(formData).then(res => {
             succFun(res.data.url)
-          })
-          .catch(error => {
+          }).catch(error => {
             failFun(error)
           })
-          
         }
       },
       tinymceFlag: 1
     }
-  }, 
+  },
   mounted () {
     tinymce.init({})
     window.onresize = () => {
       let height = window.innerHeight
-      this.mce.style.setProperty('height', height-55+'px', 'important')
+      this.mce.style.setProperty('height', height - 55 + 'px', 'important')
     }
     this.userInfo = getUserInfo()
     this.getCategoryOptions()
-    
     // 如果是编辑则将编辑数据赋值到当前页面中
     if (this.$route.params.item) {
       let item = this.$route.params.item
@@ -176,10 +171,10 @@ export default {
       // 如果分类列表暂时还未获取到
       if (!this.categoryOptions.length) {
         this.categoryReady = category => {
-          category.forEach((v, i)=> v.sub_cate.forEach(v1 => {
+          category.forEach((v, i) => v.sub_cate.forEach(v1 => {
             // 查找到分类id后返回
-            if (item.sub_id == v1.id) {
-              this.sub_id=[category[i].id, v1.id]
+            if (Number(item.sub_id) === Number(v1.id)) {
+              this.sub_id = [category[i].id, v1.id]
               return false
             }
           }))
@@ -208,14 +203,14 @@ export default {
 
     // 保存草稿
     async handleSaveDraft () {
-      let { content, title, sub_id } = this
+      let { content, title, subId } = this
 
-      if (this.postStatus == 0) {
+      if (Number(this.postStatus) === 0) {
         // 当前是从 待发布页面进入 对帖子进行编辑，修改帖子内容即可
         await postEdit({
           title,
           content,
-          sub_id: sub_id ? sub_id[1] : 0,
+          sub_id: subId ? subId[1] : 0,
           id: this.post_id,
           time: moment().format('YYYY-MM-DD HH:mm:ss')
         })
@@ -226,33 +221,32 @@ export default {
           content,
           user_id: this.userInfo.id,
           time: moment().format('YYYY-MM-DD HH:mm:ss'),
-          sub_id: sub_id ? sub_id[1] : 0,
+          sub_id: subId ? subId[1] : 0,
           status: 0
         })
       }
-      
       this.$message({
         message: '保存草稿成功',
         type: 'success'
       })
       setTimeout(() => {
         this.$router.go(-1)
-      },500)
+      }, 500)
     },
 
     // 发布
     async handlePublish () {
-      let { content, title, sub_id } = this
+      let { content, title, subID } = this
       // 检查数据
       if (!this.checkValid()) return
 
-      if (this.postStatus == 0) {
+      if (Number(this.postStatus) === 0) {
         // 当前是从 待发布页面进入 对帖子进行编辑，修改帖子内容即可
         await postEdit({
           title,
           content,
           time: moment().format('YYYY-MM-DD HH:mm:ss'),
-          sub_id: sub_id[1],
+          sub_id: subID[1],
           status: 1,
           id: this.post_id
         })
@@ -263,29 +257,28 @@ export default {
           content,
           user_id: this.userInfo.id,
           time: moment().format('YYYY-MM-DD HH:mm:ss'),
-          sub_id: sub_id[1],
+          sub_id: subID[1],
           status: 1
         })
       }
-      
       this.$message({
         message: '发布成功',
         type: 'success'
       })
       setTimeout(() => {
         this.$router.go(-1)
-      },500)
+      }, 500)
     },
 
     // 保存编辑
     async handleSaveEdit () {
-      let { content, title, sub_id } = this
+      let { content, title, subId } = this
       // 检查数据
       if (!this.checkValid()) return
       await postEdit({
         title,
         content,
-        sub_id: sub_id[1],
+        sub_id: subId[1],
         id: this.post_id
       })
       this.$message({
@@ -294,20 +287,20 @@ export default {
       })
       setTimeout(() => {
         this.$router.go(-1)
-      },500)
+      }, 500)
     },
 
     // 检查数据
     checkValid () {
-      let { content, title, sub_id } = this
+      let { content, title, subID } = this
       // 判断标题和内容是否为空
-      if (title.trim() == '') {
+      if (title.trim() === '') {
         this.$message({message: '标题不能为空！', type: 'error'})
         return false
-      } else if (content.trim() == '') {
+      } else if (content.trim() === '') {
         this.$message({message: '帖子内容不能为空！', type: 'error'})
         return false
-      } else if (!sub_id) {
+      } else if (!subID) {
         this.$message({message: '请选择帖子分类！', type: 'error'})
         return false
       }

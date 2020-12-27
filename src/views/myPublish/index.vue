@@ -48,7 +48,7 @@
         <el-pagination
           @current-change="handleCurrentChange"
           :current-page="paginationData.page"
-          :page-size="paginationData.limit" 
+          :page-size="paginationData.limit"
           layout="total, prev, pager, next, jumper"
           :total="total">
         </el-pagination>
@@ -59,10 +59,10 @@
 
 <script>
 import moment from 'moment'
-moment.locale('zh-cn')
 import { fetchPublish } from '@/api/userCenter'
 import { deletePost } from '@/api/post'
 import { getUserInfo } from '@/utils'
+moment.locale('zh-cn')
 
 export default {
   data () {
@@ -84,10 +84,8 @@ export default {
   },
   mounted () {
     this.getPublishList()
-    if (getUserInfo().id != this.$route.params.id)
-      this.prefix = 'Ta'
-    else
-      this.self = true
+    if (Number(getUserInfo().id) !== Number(this.$route.params.id)) this.prefix = 'Ta'
+    else this.self = true
   },
   methods: {
     // 获取发布列表
@@ -101,7 +99,6 @@ export default {
 
     // 编辑帖子
     handleEdit (item) {
-      let id = item.id
       this.$router.push({
         name: 'editor',
         params: {
@@ -223,7 +220,6 @@ export default {
               }
             }
           }
-          
         }
       }
 

@@ -92,7 +92,6 @@ export default {
     emphasizeKeywords (val) {
       let nowKeywords = this.queryKeyWords
       return val.replace(nowKeywords, `<span style="color: #f00; font-size: 18px; font-weight: bold;">${nowKeywords}</span>`)
-      return val
     },
 
     // 点击搜索

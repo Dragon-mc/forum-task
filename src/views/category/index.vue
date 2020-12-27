@@ -95,11 +95,11 @@ export default {
       const query = this.$route.query
       if (query.main_cate) {
         param.main_cate = query.main_cate
-      }else if (query.sub_cate) {
+      } else if (query.sub_cate) {
         param.sub_cate = query.sub_cate
       }
       let res = await fetchPost(param)
-      if (res.data.length == 0) {
+      if (res.data.length === 0) {
         this.hasMore = false
         this.$message({
           message: '没有更多数据',
@@ -127,7 +127,7 @@ export default {
             message: '没有更多数据',
             type: 'success',
             onClose: () => {
-              this.hasShowMessage = false 
+              this.hasShowMessage = false
             }
           })
         }
@@ -136,7 +136,7 @@ export default {
   },
   watch: {
     // 监听路由改变，刷新页面
-    $route : {
+    $route: {
       deep: true,
       handler () {
         this.resetRequestData()

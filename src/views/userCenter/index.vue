@@ -119,10 +119,8 @@ export default {
     })
     this.userInfo = res.data
     // console.log(this.userInfo);
-    if (this.nowUserId != this.visit_id)
-      this.prefix = 'Ta'
-    else
-      this.self = true
+    if (Number(this.nowUserId) !== Number(this.visit_id)) this.prefix = 'Ta'
+    else this.self = true
     // console.log(this.$route);
   },
 
@@ -131,7 +129,7 @@ export default {
     reload () {
       this.isRouterAlive = false
       this.$nextTick(() => {
-        this.isRouterAlive =true
+        this.isRouterAlive = true
       })
     },
     // 点击上传头像
@@ -140,7 +138,7 @@ export default {
     },
 
     handleChange (file, fileList) {
-      if (file.status == 'ready') {
+      if (file.status === 'ready') {
         // 选择了文件
         let fileInfo = file.raw
         // 判断图片大小是否小于2M
@@ -149,7 +147,7 @@ export default {
           this.fileList = []
           this.$refs.upload.uploadFiles = []
           return
-        } else if (fileInfo.type.indexOf('image') == -1) {
+        } else if (fileInfo.type.indexOf('image') === -1) {
           // 判断选择的是否为图片
           this.$alert('请选择图片资源!', '提示', { type: 'error' })
           this.fileList = []
@@ -157,30 +155,14 @@ export default {
           return
         }
 
-        function checkImg (url) {
-          return new Promise((resolve, reject) => {
-            let img = new Image()
-            img.src = url
-            img.onload = () => {
-              if (img.width < 150 || img.height < 150) {
-                reject()
-              } else {
-                resolve()
-              }
-            }
-          })
-        }
         // 检查文件大小
-        checkImg(file.url)
-        .then(() => {
+        this.checkImg(file.url).then(() => {
           this.showUpload = true
-        })
-        .catch(() => {
+        }).catch(() => {
           this.$alert('图片宽度*高度至少为150*150像素!', '提示', { type: 'error' })
           this.fileList = []
           this.$refs.upload.uploadFiles = []
         })
-
       }
     },
 
@@ -188,16 +170,14 @@ export default {
     handleDialogOpen () {
       // 清空图片上传中所有的数据
       this.fileList = []
-      if (this.$refs.upload)
-        this.$refs.upload.uploadFiles = []
+      if (this.$refs.upload) this.$refs.upload.uploadFiles = []
       this.showUpload = false
     },
 
     // 将头像上传至服务器并修改用户头像
     async handleRequestUpload (param) {
-      let fileUrl = this.$refs.upload.uploadFiles[0].url
+      // let fileUrl = this.$refs.upload.uploadFiles[0].url
       const file = param.file
-      
       const forms = new FormData()
       forms.append('file', file)
       forms.append('user_id', this.userInfo.id)
@@ -227,12 +207,11 @@ export default {
         message: '修改头像成功',
         type: 'success'
       })
-      
     },
 
     // 关注和取消关注用户
     async handleAttentionOperate () {
-      if (this.visit_id == 0) {
+      if (Number(this.visit_id) === 0) {
         this.$message({
           message: '请登录后操作！',
           type: 'error'
@@ -261,6 +240,20 @@ export default {
         message,
         type: 'success'
       })
+    },
+
+    checkImg (url) {
+      return new Promise((resolve, reject) => {
+        let img = new Image()
+        img.src = url
+        img.onload = () => {
+          if (img.width < 150 || img.height < 150) {
+            reject(new Error('图片宽度*高度至少为150*150像素!'))
+          } else {
+            resolve()
+          }
+        }
+      })
     }
 
   },
@@ -269,8 +262,8 @@ export default {
     '$route.params.id': {
       handler () {
         // 当前查看的用户id
-        let id = this.$route.params.id
-        if (id != this.userInfo.id) {
+        let id = Number(this.$route.params.id)
+        if (id !== Number(this.userInfo.id)) {
           // 如果当前查看的用户id，和已存在用户信息的id不一样，则重新获取
           this.$router.go(0)
         }
@@ -382,13 +375,10 @@ export default {
       padding: 12px 0;
       .main {
         .nav {
-          // height: 300px;
           background: #fff;
           border-radius: 12px;
           padding: 16px 0;
           li {
-            // height: 35px;
-            
             margin-bottom: 16px;
             a {
               display: flex;

@@ -67,7 +67,7 @@ export default new Router({
     },
     {
       path: '/uc/:id',
-      name: 'userCenter',
+      // name: 'userCenter',
       component: userCenter,
       children: [
         {
@@ -118,7 +118,7 @@ export default new Router({
     },
     {
       path: '/rank',
-      name: 'rank',
+      // name: 'rank',
       component: rank,
       children: [
         {
@@ -134,7 +134,8 @@ export default new Router({
           path: 'comment_rank',
           name: 'comment_rank',
           component: commentRank
-        },{
+        },
+        {
           path: 'attention_rank',
           name: 'attention_rank',
           component: attentionRank

@@ -43,7 +43,7 @@
         <el-pagination
           @current-change="handleCurrentChange"
           :current-page="paginationData.page"
-          :page-size="paginationData.limit" 
+          :page-size="paginationData.limit"
           layout="total, prev, pager, next, jumper"
           :total="total">
         </el-pagination>
@@ -54,8 +54,8 @@
 
 <script>
 import moment from 'moment'
-moment.locale('zh-cn')
 import { fetchHistory } from '@/api/userCenter'
+moment.locale('zh-cn')
 
 export default {
   data () {
@@ -169,7 +169,6 @@ export default {
             justify-content: flex-end;
             align-items: flex-end;
             .read_num {
-              
             }
             .comment_num {
 

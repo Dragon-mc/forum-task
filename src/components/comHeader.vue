@@ -41,8 +41,7 @@
 
 <script>
 import Cookies from 'js-cookie'
-import { isLogin } from '@/utils'
-import { getUserInfo } from '@/utils'
+import { isLogin, getUserInfo } from '@/utils'
 
 export default {
   props: {
@@ -66,7 +65,7 @@ export default {
     this.userInfo = getUserInfo()
     this.login = isLogin()
 
-    if (this.index == -1) {
+    if (this.index === -1) {
       this.indicatorIndex = 0
       this.hasIndicator = 0
       return
@@ -76,22 +75,21 @@ export default {
   methods: {
     // 点击搜索按钮，搜索内容
     handldSearch () {
-      if (this.searchInput.trim() == '') return
+      if (this.searchInput.trim() === '') return
       let route = this.$router.resolve({
         path: '/search',
         query: {keywords: this.searchInput}
       })
       window.open(route.href, '_blank')
     },
-    
     handleInNav (index) {
       this.indicatorIndex = index
-      if (this.index == -1) this.hasIndicator = 1
+      if (this.index === -1) this.hasIndicator = 1
     },
 
     handleOutNav () {
-      this.indicatorIndex = this.index == -1 ? 0 : this.index
-      if (this.index == -1) this.hasIndicator = 0
+      this.indicatorIndex = this.index === -1 ? 0 : this.index
+      if (this.index === -1) this.hasIndicator = 0
     },
 
     // 跳转个人中心
@@ -103,7 +101,7 @@ export default {
         })
         return
       }
-      let route = this.$router.push({
+      this.$router.push({
         path: `/uc/${this.userInfo.id}`
       })
       // window.open(route.href, this.index==2?'_self':'_blank')
@@ -118,7 +116,7 @@ export default {
         })
         return
       }
-      this.$router.push("/editor")
+      this.$router.push('/editor')
     },
 
     // 退出登录
@@ -129,10 +127,9 @@ export default {
         type: 'success'
       })
       this.login = isLogin()
-      if (this.$route.path != '/index') {
+      if (this.$route.path !== '/index') {
         this.$router.replace('/index')
       }
-      
     }
 
   }
@@ -226,6 +223,5 @@ export default {
         }
       }
     }
-    
   }
 </style>

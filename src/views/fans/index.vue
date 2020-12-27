@@ -28,7 +28,7 @@
         <el-pagination
           @current-change="handleCurrentChange"
           :current-page="paginationData.page"
-          :page-size="paginationData.limit" 
+          :page-size="paginationData.limit"
           layout="total, prev, pager, next, jumper"
           :total="total">
         </el-pagination>
@@ -47,7 +47,7 @@ export default {
   data () {
     return {
       attentionList: [],
-      visit_id: undefined,   
+      visit_id: undefined,
       prefix: '我',
       total: 0,
       paginationData: {
@@ -59,9 +59,7 @@ export default {
   mounted () {
     this.visit_id = getUserInfo().id || 0
     this.getFansList()
-
-    if (this.visit_id != this.$route.params.id)
-        this.prefix = 'Ta'
+    if (Number(this.visit_id) !== Number(this.$route.params.id)) this.prefix = 'Ta'
   },
   methods: {
     // 获取粉丝列表
@@ -96,9 +94,9 @@ export default {
       this.attentionList[index].is_attention = true
     },
 
-    //检查登录
+    // 检查登录
     checkLogin () {
-      if (this.visit_id == 0) {
+      if (Number(this.visit_id) === 0) {
         this.$message({
           message: '请登录后操作！',
           type: 'error'

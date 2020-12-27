@@ -10,14 +10,14 @@ import './styles/index.css'
 import './styles/responsive.css'
 import './styles/iconfont.css'
 
-import VueParticles from 'vue-particles'  
+import VueParticles from 'vue-particles'
 
 import router from './router'
 
 Vue.config.productionTip = false
 
 Vue.use(ElementUI)
-Vue.use(VueParticles) 
+Vue.use(VueParticles)
 
 /* eslint-disable no-new */
 new Vue({

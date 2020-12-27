@@ -45,7 +45,7 @@ export function uploadImg (data) {
   return request({
     url: '/front/post/uploadImg',
     method: 'post',
-    headers: {'Content-Type':'multipart/form-data'},
+    headers: { 'Content-Type': 'multipart/form-data' },
     data
   })
 }

@@ -39,7 +39,6 @@
       </el-form-item>
 
       <el-form-item prop="password" class="input-wrap">
-        
         <el-input
           :key="passwordType"
           ref="password"
@@ -101,13 +100,12 @@
 
 <script>
 import Cookies from 'js-cookie'
-import moment from 'moment'
 import { getVerifyCode, freeCache } from '@/api/register'
 import { login } from '@/api/user'
 import { guid } from '@/utils/index'
 
 export default {
-  data() {
+  data () {
     const validateUsername = (rule, value, callback) => {
       if (value.length < 6 || value.length > 16) {
         callback(new Error('请输入正确的用户名！'))
@@ -147,10 +145,7 @@ export default {
       this.$router.replace('/index')
     }
   },
-  created() {
-    // window.addEventListener('storage', this.afterQRScan)
-  },
-  async mounted() {
+  async mounted () {
     if (this.loginForm.username === '') {
       this.$refs.username.focus()
     } else if (this.loginForm.password === '') {
@@ -169,11 +164,8 @@ export default {
     let res = await getVerifyCode({token: this.loginForm.token})
     this.verifyCodeSrc = res.data
   },
-  destroyed() {
-    // window.removeEventListener('storage', this.afterQRScan)
-  },
   methods: {
-    showPwd() {
+    showPwd () {
       if (this.passwordType === 'password') {
         this.passwordType = ''
       } else {
@@ -183,12 +175,11 @@ export default {
         this.$refs.password.focus()
       })
     },
-    handleLogin() {
+    handleLogin () {
       this.$refs.loginForm.validate(valid => {
         if (valid) {
           this.loading = true
-          login(this.loginForm)
-          .then(res => {
+          login(this.loginForm).then(res => {
             Cookies.set('forum-user', res.data)
             this.$message({
               message: '登录成功！',
@@ -196,9 +187,8 @@ export default {
             })
             setTimeout(() => {
               this.$router.replace('/index')
-            }, 1000);
-          })
-          .catch(() => {
+            }, 1000)
+          }).catch(() => {
             this.loading = false
           })
         } else {
@@ -212,8 +202,7 @@ export default {
     async reloadVerifyCode () {
       let res = await getVerifyCode({token: this.loginForm.token})
       this.verifyCodeSrc = res.data
-    },
-
+    }
   }
 }
 </script>

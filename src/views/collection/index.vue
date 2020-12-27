@@ -50,7 +50,7 @@
         <el-pagination
           @current-change="handleCurrentChange"
           :current-page="paginationData.page"
-          :page-size="paginationData.limit" 
+          :page-size="paginationData.limit"
           layout="total, prev, pager, next, jumper"
           :total="total">
         </el-pagination>
@@ -61,10 +61,10 @@
 
 <script>
 import moment from 'moment'
-moment.locale('zh-cn')
 import { fetchCollection } from '@/api/userCenter'
 import { collection, calcelCollection } from '@/api/user'
 import { getUserInfo } from '@/utils'
+moment.locale('zh-cn')
 
 export default {
   data () {
@@ -88,8 +88,7 @@ export default {
   mounted () {
     this.visit_id = getUserInfo().id || 0
     this.getCollectionList()
-    if (this.visit_id != this.$route.params.id)
-      this.prefix = 'Ta'
+    if (Number(this.visit_id) !== Number(this.$route.params.id)) this.prefix = 'Ta'
   },
   methods: {
     // 获取收藏列表
@@ -104,7 +103,7 @@ export default {
 
     // 处理收藏点击
     async handleCollectionOperate (item) {
-      if (this.visit_id == 0) {
+      if (Number(this.visit_id) === 0) {
         this.$message({
           message: '请登录后操作！',
           type: 'error'
