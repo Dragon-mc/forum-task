@@ -1,6 +1,6 @@
 <template>
   <div class="user_center_wrap">
-    <com-header :index="2"></com-header>
+    <com-header :index="2" v-if="isRouterAlive"></com-header>
     <div class="info_card">
       <div class="inner my-container">
         <div class="left_info_wrap">
@@ -73,7 +73,7 @@
           <i class="el-icon-upload"></i>
           <div class="el-upload__text">将文件拖到此处，或<em>点击上传</em></div>
         </div>
-        <div v-show="!showUpload" class="el-upload__tip" slot="tip">只能上传jpg/png文件，且不超过500kb</div>
+        <div v-show="!showUpload" class="el-upload__tip" slot="tip">只能上传jpg/png文件，且不超过2MB</div>
       </el-upload>
       <span slot="footer" class="dialog-footer">
         <el-button @click="dialogVisible = false" size="small">取 消</el-button>
@@ -88,7 +88,7 @@ import Cookies from 'js-cookie'
 import moment from 'moment'
 import comHeader from '@/components/comHeader'
 import comFooter from '@/components/comFooter'
-import { getUserCenterInfo, uploadAvatar, modifyAvatar } from '@/api/userCenter'
+import { getUserCenterInfo, uploadAvatar } from '@/api/userCenter'
 import { attention, cancelAttention } from '@/api/user'
 import { getUserInfo } from '@/utils'
 
@@ -103,7 +103,9 @@ export default {
       // 上传的文件列表
       fileList: [],
       // 上传并保存 的 显示
-      showUpload: false
+      showUpload: false,
+      // 头部组件状态
+      isRouterAlive: true
     }
   },
 
@@ -125,6 +127,13 @@ export default {
   },
 
   methods: {
+    // 头部组件刷新
+    reload () {
+      this.isRouterAlive = false
+      this.$nextTick(() => {
+        this.isRouterAlive =true
+      })
+    },
     // 点击上传头像
     handleUploadAvatar () {
       this.dialogVisible = true
@@ -192,6 +201,7 @@ export default {
       const forms = new FormData()
       forms.append('file', file)
       forms.append('user_id', this.userInfo.id)
+      forms.append('avatar', this.userInfo.avatar)
       // 发送请求，上传用户头像
       let res
       try {
@@ -208,6 +218,8 @@ export default {
       myUserInfo.avatar = url
       // 修改cookies中用户的头像
       Cookies.set('forum-user', myUserInfo)
+      // 刷新header组件
+      this.reload()
       // 修改当前页面用户的头像
       this.userInfo.avatar = url
       this.dialogVisible = false

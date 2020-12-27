@@ -72,11 +72,3 @@ export function uploadAvatar (data) {
     data
   })
 }
-
-export function modifyAvatar (data) {
-  return request({
-    url: '/front/userCenter/modifyAvatar',
-    method: 'post',
-    data
-  })
-}
