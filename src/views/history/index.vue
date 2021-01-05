@@ -3,7 +3,7 @@
     <div class="title">
       历史记录
     </div>
-    <div class="history_list">
+    <div class="history_list" v-if="historyList.length">
       <div class="history_item" v-for="item in historyList" :key="item.id">
         <div class="user_info">
           <div class="user_avatar">
@@ -24,15 +24,15 @@
               <router-link :to="`/post/${item.id}`" target="_blank">{{item.title}}</router-link>
             </div>
             <div class="post_content">
-              {{item.content}}
+              {{item.content | delTag}}
             </div>
           </el-col>
           <el-col :span="4" class="info_right">
             <el-row :gutter="12">
-              <el-col :sm="12" :md="12" :lg="12" class="read_num">
+              <el-col :sm="12" :md="12" :lg="12" :xl="12" class="read_num">
                 <router-link :to="`/post/${item.id}`" target="_blank"><i class="el-icon-view"></i>{{item.read_times}}</router-link>
               </el-col>
-              <el-col :sm="12" :md="12" :lg="12" class="comment_num">
+              <el-col :sm="12" :md="12" :lg="12" :xl="12" class="comment_num">
                 <router-link :to="`/post/${item.id}`" target="_blank"><i class="el-icon-chat-dot-round"></i>{{item.comment_times}}</router-link>
               </el-col>
             </el-row>
@@ -49,12 +49,16 @@
         </el-pagination>
       </div>
     </div>
+    <div class="no-data" v-else>
+      <img :src="'./static/img/no-data.png'" alt="">
+    </div>
   </div>
 </template>
 
 <script>
 import moment from 'moment'
 import { fetchHistory } from '@/api/userCenter'
+import { delHtmlTag } from '@/utils'
 moment.locale('zh-cn')
 
 export default {
@@ -71,6 +75,9 @@ export default {
   filters: {
     fromNow (time) {
       return moment(time).fromNow()
+    },
+    delTag (val) {
+      return delHtmlTag(val)
     }
   },
   mounted () {
@@ -200,6 +207,13 @@ export default {
         }
       }
 
+    }
+    .no-data {
+      display: flex;
+      justify-content: center;
+      img {
+        width: 30%;
+      }
     }
   }
 </style>

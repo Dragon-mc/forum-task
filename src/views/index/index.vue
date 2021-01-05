@@ -4,72 +4,25 @@
     <div class="container_wrap my-container clearfix">
       <el-row :gutter="12">
         <!-- 左侧固定分类导航栏 -->
-        <el-col :md="2" :lg="2">
+        <el-col :md="2" :lg="2" :xl="2">
           <div class="ul_wrap">
-            <ul class="nav_cate_bar clearfix">
+            <ul class="nav_cate_bar clearfix" ref="navCateBar">
               <li v-for="item in cateList" :key="item.id"><router-link :to="{path: `/cate`, query: {main_cate: item.id}}" target="_blank">{{item.name}}</router-link></li>
-              <!-- <li><a href="javascript:;">Python</a></li>
-              <li><a href="javascript:;">Java</a></li>
-              <li><a href="javascript:;">Javascript</a></li>
-              <li><a href="javascript:;">PHP</a></li>
-              <li><a href="javascript:;">Go</a></li>
-              <li><a href="javascript:;">C</a></li>
-              <li><a href="javascript:;">C++</a></li>
-              <li><a href="javascript:;">C#</a></li> -->
             </ul>
           </div>
         </el-col>
         <!-- 右侧滚动内容 -->
-        <el-col :md="22" :lg="22" class="scroll_content">
+        <el-col :md="22" :lg="22" :xl="22" class="scroll_content">
           <el-row :gutter="12">
-            <el-col class="main" :md="17" :lg="17">
-              <!-- 轮播图 -->
-              <div class="carousel">
-                <el-carousel trigger="click" height="300px">
-                  <el-carousel-item v-for="item in 4" :key="item">
-                    <h3 class="small">{{ item }}</h3>
-                  </el-carousel-item>
-                </el-carousel>
-              </div>
-              <div class="recoomend_list">
-                <ul>
-                  <li v-for="item in recommendPostList" :key="item.id">
-                    <div class="list_content">
-                      <div class="title">
-                        <h2><router-link target="_blank" :to="`/post/${item.id}`">{{item.title}}</router-link></h2>
-                      </div>
-                      <div class="summary_content">
-                          {{item.content}}
-                        </div>
-                      <div class="list_user_bar">
-                        <router-link :to="`/uc/${item.user_id}`" target="_blank" class="user">
-                          <img :src="item.avatar || './static/img/photo.jpg'" alt="avatar">
-                          <div class="name">
-                            {{item.nickname || item.username}}
-                          </div>
-                        </router-link>
-                        <div class="interactive">
-                          <div class="read_num">
-                            <router-link :to="`/post/${item.id}`" target="_blank"><i class="el-icon-view"></i>{{item.read_times}}</router-link>
-                          </div>
-                          <div class="comment_num">
-                            <router-link :to="`/post/${item.id}`" target="_blank"><i class="el-icon-chat-dot-round"></i>{{item.comment_times}}</router-link>
-                          </div>
-                        </div>
-                      </div>
-                    </div>
-                  </li>
-                </ul>
-              </div>
-            </el-col>
-            <el-col class="aside" :md="7" :lg="7">
+            <!-- xs和sm大小的侧边栏 -->
+            <el-col class="aside hidden-md-and-up" :xs="{span: 24, pull: 0}" :sm="{span: 24, pull: 0}" :md="{span: 7, push: 0}" :lg="{span: 7, push: 0}" :xl="{span: 7, push: 0}">
               <div class="browse_rank rank_list">
                 <div class="rank_title">
                   <span class="txt">浏览排行</span>
                   <router-link :to="{name: 'browse_rank', params: {index: 0}}"><el-tag size="small">查看更多</el-tag></router-link>
                 </div>
                 <el-row class="browse_list" :gutter="24">
-                  <el-col v-for="item in browseRank" :key="item.id" class="browse_item" :xs="12" :sm="12" :md="24" :lg="24">
+                  <el-col v-for="item in browseRank" :key="item.id" class="browse_item" :xs="12" :sm="12" :md="24" :lg="24" :xl="24">
                     <router-link :to="`/post/${item.id}`" target="_blank">
                       <el-row :gutter="12">
                         <el-col :span="6"><img :src="item.avatar || './static/img/photo.jpg'" alt=""></el-col>
@@ -89,7 +42,7 @@
                   <router-link :to="{name: 'comment_rank', params: {index: 1}}"><el-tag size="small">查看更多</el-tag></router-link>
                 </div>
                 <el-row class="comment_list" :gutter="24">
-                  <el-col v-for="item in commentRank" :key="item.post_id" class="comment_item" :xs="12" :sm="12" :md="24" :lg="24">
+                  <el-col v-for="item in commentRank" :key="item.post_id" class="comment_item" :xs="12" :sm="12" :md="24" :lg="24" :xl="24">
                     <router-link :to="`/post/${item.post_id}`" target="_blank">
                       <el-row class="user" :gutter="4">
                         <el-col :span="5"><img :src="item.details.avatar || './static/img/photo.jpg'" alt="" class="responsive_img"></el-col>
@@ -115,9 +68,8 @@
                   <router-link :to="{name: 'attention_rank', params: {index: 2}}"><el-tag size="small">查看更多</el-tag></router-link>
                 </div>
                 <el-row class="attention_list" :gutter="24">
-                  <el-col v-for="item in attentionRank" :key="item.passive_id" class="attention_item" :xs="12" :sm="12" :md="24" :lg="24">
+                  <el-col v-for="item in attentionRank" :key="item.passive_id" class="attention_item" :xs="12" :sm="12" :md="24" :lg="24" :xl="24">
                     <router-link :to="`/uc/${item.passive_id}`" target="_blank">
-                      <!-- <el-row :gutter="12"> -->
                         <div><img :src="item.user_info.avatar || './static/img/photo.jpg'" alt=""></div>
                         <div class="info">
                           <div class="name">
@@ -127,12 +79,125 @@
                             粉丝 {{item.passive_attention_num}}
                           </div>
                         </div>
-                      <!-- </el-row> -->
                     </router-link>
                   </el-col>
                 </el-row>
               </div>
             </el-col>
+            <!-- xs和sm大小的侧边栏 -->
+
+            <el-col class="main" :xs="{span: 24, push: 0}" :sm="{span: 24, push: 0}" :md="{span: 17, push: 0}" :lg="{span: 17, push: 0}" :xl="{span: 17, push: 0}">
+              <!-- 轮播图 -->
+              <div class="carousel">
+                <el-carousel trigger="click" height="300px">
+                  <el-carousel-item v-for="item in 4" :key="item">
+                    <h3 class="small">{{ item }}</h3>
+                  </el-carousel-item>
+                </el-carousel>
+              </div>
+              <!-- 推荐列表 -->
+              <div class="recoomend_list">
+                <ul>
+                  <li v-for="item in recommendPostList" :key="item.id">
+                    <div class="list_content">
+                      <div class="title">
+                        <h2><router-link target="_blank" :to="`/post/${item.id}`">{{item.title}}</router-link></h2>
+                      </div>
+                      <div class="summary_content">
+                          {{item.content | delTag}}
+                        </div>
+                      <div class="list_user_bar">
+                        <router-link :to="`/uc/${item.user_id}`" target="_blank" class="user">
+                          <img :src="item.avatar || './static/img/photo.jpg'" alt="avatar">
+                          <div class="name">
+                            {{item.nickname || item.username}}
+                          </div>
+                        </router-link>
+                        <div class="interactive">
+                          <div class="read_num">
+                            <router-link :to="`/post/${item.id}`" target="_blank"><i class="el-icon-view"></i>{{item.read_times}}</router-link>
+                          </div>
+                          <div class="comment_num">
+                            <router-link :to="`/post/${item.id}`" target="_blank"><i class="el-icon-chat-dot-round"></i>{{item.comment_times}}</router-link>
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+                  </li>
+                </ul>
+              </div>
+            </el-col>
+            <!-- md lg xl大小下的侧边栏 -->
+            <el-col class="aside hidden-sm-and-down" :xs="{span: 24, pull: 0}" :sm="{span: 24, pull: 0}" :md="{span: 7, push: 0}" :lg="{span: 7, push: 0}" :xl="{span: 7, push: 0}">
+              <div class="browse_rank rank_list">
+                <div class="rank_title">
+                  <span class="txt">浏览排行</span>
+                  <router-link :to="{name: 'browse_rank', params: {index: 0}}"><el-tag size="small">查看更多</el-tag></router-link>
+                </div>
+                <el-row class="browse_list" :gutter="24">
+                  <el-col v-for="item in browseRank" :key="item.id" class="browse_item" :xs="12" :sm="12" :md="24" :lg="24" :xl="24">
+                    <router-link :to="`/post/${item.id}`" target="_blank">
+                      <el-row :gutter="12">
+                        <el-col :span="6"><img :src="item.avatar || './static/img/photo.jpg'" alt=""></el-col>
+                        <el-col :span="18">
+                          <div class="title">
+                            {{item.title}}
+                          </div>
+                        </el-col>
+                      </el-row>
+                    </router-link>
+                  </el-col>
+                </el-row>
+              </div>
+              <div class="comment_rank rank_list">
+                <div class="rank_title">
+                  <span class="txt">评论排行</span>
+                  <router-link :to="{name: 'comment_rank', params: {index: 1}}"><el-tag size="small">查看更多</el-tag></router-link>
+                </div>
+                <el-row class="comment_list" :gutter="24">
+                  <el-col v-for="item in commentRank" :key="item.post_id" class="comment_item" :xs="12" :sm="12" :md="24" :lg="24" :xl="24">
+                    <router-link :to="`/post/${item.post_id}`" target="_blank">
+                      <el-row class="user" :gutter="4">
+                        <el-col :span="5"><img :src="item.details.avatar || './static/img/photo.jpg'" alt="" class="responsive_img"></el-col>
+                        <el-col :span="14" class="user_info">
+                          <div class="name">{{item.details.nickname || item.details.username}}</div>
+                          <div class="sign">{{item.details.sign || '这个人太懒了，什么都没留下'}}</div>
+                        </el-col>
+                        <el-col :span="5" class="msg_num">
+                          <i class="el-icon-chat-dot-round"></i>
+                          <div>{{item.commented_times}}</div>
+                        </el-col>
+                      </el-row>
+                      <div class="title">
+                        {{item.details.title}}
+                      </div>
+                    </router-link>
+                  </el-col>
+                </el-row>
+              </div>
+              <div class="attention_rank rank_list">
+                <div class="rank_title">
+                  <span class="txt">关注排行</span>
+                  <router-link :to="{name: 'attention_rank', params: {index: 2}}"><el-tag size="small">查看更多</el-tag></router-link>
+                </div>
+                <el-row class="attention_list" :gutter="24">
+                  <el-col v-for="item in attentionRank" :key="item.passive_id" class="attention_item" :xs="12" :sm="12" :md="24" :lg="24" :xl="24">
+                    <router-link :to="`/uc/${item.passive_id}`" target="_blank">
+                        <div><img :src="item.user_info.avatar || './static/img/photo.jpg'" alt=""></div>
+                        <div class="info">
+                          <div class="name">
+                            {{item.user_info.nickname || item.user_info.username}}
+                          </div>
+                          <div class="attention_num">
+                            粉丝 {{item.passive_attention_num}}
+                          </div>
+                        </div>
+                    </router-link>
+                  </el-col>
+                </el-row>
+              </div>
+            </el-col>
+            <!-- md lg xl大小下的侧边栏 -->
           </el-row>
         </el-col>
       </el-row>
@@ -144,7 +209,7 @@
 <script>
 import comHeader from '@/components/comHeader'
 import comFooter from '@/components/comFooter'
-import { getUserInfo } from '@/utils'
+import { getUserInfo, delHtmlTag } from '@/utils'
 import { fetchRecommendPostList, fetchRankList, fetchCateList } from '@/api'
 
 export default {
@@ -162,13 +227,37 @@ export default {
       hasShowMessage: false
     }
   },
+  filters: {
+    delTag (val) {
+      return delHtmlTag(val)
+    }
+  },
   mounted () {
     this.userInfo = getUserInfo()
     this.getRecommendPostList()
     this.getRankList()
     this.getCateList()
     // 添加页面滚动事件，检测页面触底，加载数据
-    document.addEventListener('scroll', this.scroll.bind(this))
+    this.scrollFunction = this.scroll.bind(this)
+    document.addEventListener('scroll', this.scrollFunction)
+    // 根据窗口大小调整 左侧分类选择栏的宽度
+    this.cateListReceiveCallback = cateList => {
+      this.width = 85 * cateList.length + 'px'
+    }
+    window.onresize = () => {
+      if (window.innerWidth < 992) {
+        if (this.$refs.navCateBar.style.width !== this.width) {
+          this.$refs.navCateBar.style.width = this.width
+        }
+      } else {
+        if (this.$refs.navCateBar.style.width !== 'auto') {
+          this.$refs.navCateBar.style.width = 'auto'
+        }
+      }
+    }
+  },
+  beforeDestroy () {
+    document.removeEventListener('scroll', this.scrollFunction)
   },
   methods: {
     // 重置请求参数
@@ -205,6 +294,7 @@ export default {
     async getCateList () {
       let res = await fetchCateList()
       this.cateList = res.data
+      if (this.cateListReceiveCallback) this.cateListReceiveCallback(res.data)
     },
 
     scroll () {
@@ -250,7 +340,7 @@ export default {
       overflow-x: scroll;
       overflow-y: hidden;
       .nav_cate_bar {
-        width: 85px * 13;
+        // width: 85px * 13;
         li {
             float: left;
             width: 85px;
@@ -265,6 +355,7 @@ export default {
     .container_wrap {
       padding: 12px 0;
       .ul_wrap {
+        min-height: 40px;
         background: #fff;
         border-radius: 12px;
         .nav_cate_bar {

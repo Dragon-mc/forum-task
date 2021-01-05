@@ -127,7 +127,7 @@
 </template>
 
 <script>
-import Cookies from 'js-cookie'
+// import Cookies from 'js-cookie'
 import moment from 'moment'
 import { getVerifyCode, checkUserExist } from '@/api/register' // , freeCache
 import { register } from '@/api/user'
@@ -139,12 +139,11 @@ export default {
       // 发送请求，检验用户名是否存在
       let res = {}
       if (value.trim() !== '') res = await checkUserExist({username: this.registerForm.username})
-      // .then(res => {
-      //   if (res.data) {
-      //     callback(new Error('用户名已存在'))
-      //   }
-      // })
-      if (res.data) callback(new Error('用户名已存在'))
+      if (res.data) callback(new Error('用户名已存在！'))
+      // 检测用户名是否为数字和字母
+      let reg = /[A-z0-9]+/
+      if (!reg.test(value)) callback(new Error('用户名只能为英文数字组合！'))
+      // 检测用户名长度
       if (value.length < 6 || value.length > 16) {
         callback(new Error('请输入正确的用户名！'))
       } else {

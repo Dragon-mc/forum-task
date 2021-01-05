@@ -1,16 +1,16 @@
 <template>
-  <div class="attention_wrap">
+  <div class="fans_wrap">
     <div class="title">
       {{prefix}}的粉丝
     </div>
-    <div class="attention_list">
-      <el-row class="attention_item" v-for="(item, index) in attentionList" :key="item.id">
-        <el-col :xs="5" :sm="3" :md="2" :lg="2" class="avatar">
+    <div class="fans_list" v-if="fansList.length">
+      <el-row class="fans_item" v-for="(item, index) in fansList" :key="item.id">
+        <el-col :xs="5" :sm="3" :md="2" :lg="2" :xl="2" class="avatar">
           <router-link :to="`/uc/${item.id}`" target="_blank">
             <img :src="item.avatar || './static/img/photo.jpg'" alt="">
           </router-link>
         </el-col>
-        <el-col :xs="13" :sm="17" :md="20" :lg="20" class="name_sign">
+        <el-col :xs="13" :sm="17" :md="20" :lg="20" :xl="20" class="name_sign">
           <router-link :to="`/uc/${item.id}`" target="_blank" class="name">
             {{item.nickname || item.username}}
           </router-link>
@@ -18,7 +18,7 @@
             {{item.sign || '这个人很懒，什么都没写上'}}
           </router-link>
         </el-col>
-        <el-col :xs="6" :sm="4" :md="2" :lg="2" class="attention">
+        <el-col :xs="6" :sm="4" :md="2" :lg="2" :xl="2" class="attention">
           <div v-if="visit_id==item.id" class="btn at_btn">自己</div>
           <div v-else-if="item.is_attention" class="btn" :class="{'no_atte': false}" @click="handleCancelAttention(index)">取消关注</div>
           <div v-else class="btn at_btn" :class="{'no_atte': false}" @click="handleAttention(index)">关注TA</div>
@@ -34,6 +34,9 @@
         </el-pagination>
       </div>
     </div>
+    <div class="no-data" v-else>
+      <img :src="'./static/img/no-data.png'" alt="">
+    </div>
   </div>
 </template>
 
@@ -46,7 +49,7 @@ import { getUserInfo } from '@/utils'
 export default {
   data () {
     return {
-      attentionList: [],
+      fansList: [],
       visit_id: undefined,
       prefix: '我',
       total: 0,
@@ -68,30 +71,30 @@ export default {
       data.id = this.$route.params.id
       data.visit_id = this.visit_id
       let res = await fetchFans(data)
-      this.attentionList = res.data.items
+      this.fansList = res.data.items
       this.total = res.data.total
     },
 
     // 取消关注
     async handleCancelAttention (index) {
       if (!this.checkLogin()) return
-      await cancelAttention({active_id: this.visit_id, passive_id: this.attentionList[index].id})
+      await cancelAttention({active_id: this.visit_id, passive_id: this.fansList[index].id})
       this.$message({
         message: '取消关注',
         type: 'success'
       })
-      this.attentionList[index].is_attention = false
+      this.fansList[index].is_attention = false
     },
 
     // 关注
     async handleAttention (index) {
       if (!this.checkLogin()) return
-      await attention({active_id: this.visit_id, passive_id: this.attentionList[index].id, time: moment().format('YYYY-MM-DD HH:mm:ss')})
+      await attention({active_id: this.visit_id, passive_id: this.fansList[index].id, time: moment().format('YYYY-MM-DD HH:mm:ss')})
       this.$message({
         message: '关注成功！',
         type: 'success'
       })
-      this.attentionList[index].is_attention = true
+      this.fansList[index].is_attention = true
     },
 
     // 检查登录
@@ -116,7 +119,7 @@ export default {
 </script>
 
 <style lang="scss" scoped>
-  .attention_wrap {
+  .fans_wrap {
     padding: 24px;
     .title {
       font-size: 16px;
@@ -124,8 +127,8 @@ export default {
       font-weight: bold;
       margin-bottom: 20px;
     }
-    .attention_list {
-      .attention_item {
+    .fans_list {
+      .fans_item {
         // margin-top: 15px;
         height: 82px;
         border-top: 1px solid #e0e0e0;
@@ -209,6 +212,13 @@ export default {
         }
       }
 
+    }
+    .no-data {
+      display: flex;
+      justify-content: center;
+      img {
+        width: 30%;
+      }
     }
   }
 </style>

@@ -3,7 +3,7 @@
     <div class="title">
       {{prefix}}发布的
     </div>
-    <div class="collection_list">
+    <div class="collection_list" v-if="postList.length">
       <div class="collection_item" v-for="(item, index) in postList" :key="item.id">
         <el-row class="time_and_interactive">
           <el-col :span="20" class="time">
@@ -11,10 +11,10 @@
           </el-col>
           <el-col :span="4" class="info_right">
             <el-row :gutter="12">
-              <el-col :sm="12" :md="12" :lg="12" class="read_num">
+              <el-col :sm="12" :md="12" :lg="12" :xl="12" class="read_num">
                 <a href="javascript:;"><i class="el-icon-view"></i>{{item.read_times}}</a>
               </el-col>
-              <el-col :sm="12" :md="12" :lg="12" class="comment_num">
+              <el-col :sm="12" :md="12" :lg="12" :xl="12" class="comment_num">
                 <a href="javascript:;"><i class="el-icon-chat-dot-round"></i>{{item.comment_times}}</a>
               </el-col>
             </el-row>
@@ -26,7 +26,7 @@
               <router-link :to="`/post/${item.id}`" target="_blank">{{item.title}}</router-link>
             </div>
             <div class="post_content">
-              {{item.content}}
+              {{item.content | delTag}}
             </div>
           </el-col>
           <el-col :span="2" class="edit" v-if="self">
@@ -54,6 +54,9 @@
         </el-pagination>
       </div>
     </div>
+    <div class="no-data" v-else>
+      <img :src="'./static/img/no-data.png'" alt="">
+    </div>
   </div>
 </template>
 
@@ -61,7 +64,7 @@
 import moment from 'moment'
 import { fetchPublish } from '@/api/userCenter'
 import { deletePost } from '@/api/post'
-import { getUserInfo } from '@/utils'
+import { getUserInfo, delHtmlTag } from '@/utils'
 moment.locale('zh-cn')
 
 export default {
@@ -80,6 +83,9 @@ export default {
   filters: {
     fromNow (time) {
       return moment(time).fromNow()
+    },
+    delTag (val) {
+      return delHtmlTag(val)
     }
   },
   mounted () {
@@ -232,6 +238,13 @@ export default {
         }
       }
 
+    }
+    .no-data {
+      display: flex;
+      justify-content: center;
+      img {
+        width: 30%;
+      }
     }
   }
 </style>

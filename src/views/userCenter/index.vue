@@ -22,6 +22,9 @@
           <div class="at_btn" v-if="!userInfo.is_attention" @click="handleAttentionOperate">关注此人</div>
           <div class="has_at_btn" v-else @click="handleAttentionOperate">取消关注</div>
         </div>
+        <div class="attention_wrap" v-else>
+          <router-link to="/editor"><div class="at_btn">发帖</div></router-link>
+        </div>
       </div>
     </div>
     <div class="container_wrap my-container">

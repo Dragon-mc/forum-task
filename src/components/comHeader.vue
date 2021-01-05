@@ -26,7 +26,7 @@
             <router-link :to="`/uc/${userInfo.id}`"><img class="avatar" :src="userInfo.avatar || './static/img/photo.jpg'"></router-link>
             <el-dropdown-menu slot="dropdown">
               <el-dropdown-item><router-link :to="`/uc/${userInfo.id}`"><i class="el-icon-user-solid"></i>个人中心</router-link></el-dropdown-item>
-              <el-dropdown-item><i class="el-icon-s-tools"></i>用户设置</el-dropdown-item>
+              <!-- <el-dropdown-item><i class="el-icon-s-tools"></i>用户设置</el-dropdown-item> -->
               <el-dropdown-item divided @click.native="handleLogout"><i class="iconfont icon-logout"></i>退出</el-dropdown-item>
             </el-dropdown-menu>
           </el-dropdown>

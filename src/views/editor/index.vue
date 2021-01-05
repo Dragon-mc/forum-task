@@ -9,7 +9,7 @@
       </div>
       <div class="cascader">
         <el-cascader
-          v-model="sub_id"
+          v-model="subId"
           :options="categoryOptions"
           :props="propsOption"
           placeholder="选择分类"
@@ -92,7 +92,7 @@ export default {
     return {
       title: '',
       content: '',
-      sub_id: undefined,
+      subId: undefined,
       edit: false,
       postStatus: undefined,
       userInfo: {},
@@ -105,17 +105,16 @@ export default {
       // 分类选择数组
       categoryOptions: [],
       editorInit: {
-        language_url: '/static/tinymce/zh_CN.js', // 指定中文包
+        language_url: process.env.VUE_APP_PUBLIC_PATH + 'static/tinymce/zh_CN.js', // 指定中文包
         language: 'zh_CN', // 中文
-        skin_url: '/static/tinymce/skins/ui/oxide', // 编辑器皮肤，\
-        emoticons_database_url: '/static/tinymce/emojis.js',
+        skin_url: process.env.VUE_APP_PUBLIC_PATH + 'static/tinymce/skins/ui/oxide', // 编辑器皮肤
+        emoticons_database_url: process.env.VUE_APP_PUBLIC_PATH + 'static/tinymce/emojis.js',
         browser_spellcheck: true, // 拼写检查
         branding: false, // 去水印
         elementpath: true, // 禁用编辑器底部的状态栏
         statusbar: true, // 隐藏编辑器底部的状态栏
         paste_data_images: true, // 允许粘贴图像
         menubar: true, // 隐藏最上方menu
-
         plugins: 'print preview searchreplace autolink directionality visualblocks visualchars fullscreen image link media template code codesample table charmap hr pagebreak nonbreaking anchor insertdatetime advlist lists wordcount imagetools textpattern help emoticons autosave', // bdmap indent2em autoresize lineheight formatpainter axupimgs
         toolbar: 'code undo redo restoredraft | cut copy paste pastetext | forecolor backcolor bold italic underline strikethrough link anchor | alignleft aligncenter alignright alignjustify outdent indent | styleselect formatselect fontselect fontsizeselect | bullist numlist | blockquote subscript superscript removeformat | table image media charmap emoticons codesample hr pagebreak insertdatetime print preview | fullscreen ', // | bdmap indent2em lineheight formatpainter axupimgs
         // 编辑器高度
@@ -174,7 +173,7 @@ export default {
           category.forEach((v, i) => v.sub_cate.forEach(v1 => {
             // 查找到分类id后返回
             if (Number(item.sub_id) === Number(v1.id)) {
-              this.sub_id = [category[i].id, v1.id]
+              this.subId = [category[i].id, v1.id]
               return false
             }
           }))
@@ -236,7 +235,7 @@ export default {
 
     // 发布
     async handlePublish () {
-      let { content, title, subID } = this
+      let { content, title, subId } = this
       // 检查数据
       if (!this.checkValid()) return
 
@@ -246,7 +245,7 @@ export default {
           title,
           content,
           time: moment().format('YYYY-MM-DD HH:mm:ss'),
-          sub_id: subID[1],
+          sub_id: subId[1],
           status: 1,
           id: this.post_id
         })
@@ -257,7 +256,7 @@ export default {
           content,
           user_id: this.userInfo.id,
           time: moment().format('YYYY-MM-DD HH:mm:ss'),
-          sub_id: subID[1],
+          sub_id: subId[1],
           status: 1
         })
       }
@@ -292,7 +291,7 @@ export default {
 
     // 检查数据
     checkValid () {
-      let { content, title, subID } = this
+      let { content, title, subId } = this
       // 判断标题和内容是否为空
       if (title.trim() === '') {
         this.$message({message: '标题不能为空！', type: 'error'})
@@ -300,7 +299,7 @@ export default {
       } else if (content.trim() === '') {
         this.$message({message: '帖子内容不能为空！', type: 'error'})
         return false
-      } else if (!subID) {
+      } else if (!subId) {
         this.$message({message: '请选择帖子分类！', type: 'error'})
         return false
       }

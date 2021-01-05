@@ -19,3 +19,7 @@ export function isLogin () {
 export function getUserInfo () {
   return JSON.parse(Cookies.get('forum-user') ? Cookies.get('forum-user') : '{}')
 }
+
+export function delHtmlTag (str) {
+  return str.replace(/<[^>]+>/g, '') // 去掉所有的html标记
+}

@@ -15,7 +15,7 @@
                 <h2><router-link target="_blank" :to="`/post/${item.id}`" v-html="emphasizeKeywords(item.title)"></router-link></h2>
               </div>
               <div class="summary_content">
-                  {{item.content}}
+                  {{item.content | delTag}}
                 </div>
               <div class="list_user_bar">
                 <router-link :to="`/uc/${item.user_id}`" target="_blank" class="user">
@@ -55,6 +55,7 @@
 import comHeader from '@/components/comHeader'
 import comFooter from '@/components/comFooter'
 import { fetchSearchPost } from '@/api/search'
+import { delHtmlTag } from '@/utils'
 
 export default {
   data () {
@@ -68,6 +69,11 @@ export default {
       pageSize: 20,
       // 总记录数
       total: 0
+    }
+  },
+  filters: {
+    delTag (val) {
+      return delHtmlTag(val)
     }
   },
   mounted () {

@@ -3,14 +3,14 @@
     <div class="title">
       {{prefix}}关注的
     </div>
-    <div class="attention_list">
+    <div class="attention_list" v-if="attentionList.length">
       <el-row class="attention_item" v-for="(item, index) in attentionList" :key="item.id">
-        <el-col :xs="5" :sm="3" :md="2" :lg="2" class="avatar">
+        <el-col :xs="5" :sm="3" :md="2" :lg="2" :xl="2" class="avatar">
           <router-link :to="`/uc/${item.id}`" target="_blank">
             <img :src="item.avatar || './static/img/photo.jpg'" alt="">
           </router-link>
         </el-col>
-        <el-col :xs="13" :sm="17" :md="20" :lg="20" class="name_sign">
+        <el-col :xs="13" :sm="17" :md="20" :lg="20" :xl="20" class="name_sign">
           <router-link :to="`/uc/${item.id}`" target="_blank" class="name">
             {{item.nickname || item.username}}
           </router-link>
@@ -18,7 +18,7 @@
             {{item.sign || '这个人很懒，什么都没写上'}}
           </router-link>
         </el-col>
-        <el-col :xs="6" :sm="4" :md="2" :lg="2" class="attention">
+        <el-col :xs="6" :sm="4" :md="2" :lg="2" :xl="2" class="attention">
           <div v-if="visit_id==item.id" class="btn at_btn">自己</div>
           <div v-else-if="item.is_attention" class="btn" :class="{'no_atte': false}" @click="handleCancelAttention(index)">取消关注</div>
           <div v-else class="btn at_btn" :class="{'no_atte': false}" @click="handleAttention(index)">关注TA</div>
@@ -33,6 +33,9 @@
           :total="total">
         </el-pagination>
       </div>
+    </div>
+    <div class="no-data" v-else>
+      <img :src="'./static/img/no-data.png'" alt="">
     </div>
   </div>
 </template>
@@ -209,6 +212,13 @@ export default {
         }
       }
 
+    }
+    .no-data {
+      display: flex;
+      justify-content: center;
+      img {
+        width: 30%;
+      }
     }
   }
 </style>

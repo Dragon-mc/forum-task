@@ -1,27 +1,42 @@
 <template>
-  <div class="post_wrap">
+  <div class="post_wrap" @click.exact="handleWrapClick">
     <com-header :index="-1"></com-header>
     <div class="my-container">
       <el-row :gutter="12" class="main">
-        <el-col :xs="24" :sm="24" :md="6" :lg="5">
+        <div class="cover" v-if="Number(postInfo.status)===2">
+          <img draggable="false" :src="'./static/img/cancel.png'" alt="">
+        </div>
+        <el-col :xs="24" :sm="24" :md="6" :lg="5" :xl="5">
           <div class="author_info">
             <el-row>
-              <el-col :xs="4" :sm="3" :md="8" :lg="8" class="author_avatar">
+              <el-col :xs="4" :sm="3" :md="8" :lg="8" :xl="8" class="author_avatar">
                 <router-link :to="`/uc/${postInfo.user_info.id}`" target="_blank"><img :src="postInfo.user_info.avatar || './static/img/photo.jpg'" alt=""></router-link>
               </el-col>
-              <el-col :xs="5" :sm="4" :md="16" :lg="16" class="author_name">
+              <el-col :xs="5" :sm="4" :md="16" :lg="16" :xl="16" class="author_name">
                 <router-link :to="`/uc/${postInfo.user_info.id}`" target="_blank">{{postInfo.user_info.nickname || postInfo.user_info.username}}</router-link>
               </el-col>
-              <el-col :xs="15" :sm="17" :md="24" :lg="24" class="author_sign">
+              <el-col :xs="15" :sm="17" :md="24" :lg="24" :xl="24" class="author_sign">
                 {{postInfo.user_info.sign || '这个人很懒，什么都没留下'}}
               </el-col>
             </el-row>
             <div class="line-box"></div>
             <div class="interactive">
-              <div class="attention"><el-col :xs="12" :sm="12" :md="24" :lg="24" class="num">{{postInfo.user_info.attention_num}}</el-col><el-col :xs="12" :sm="12" :md="24" :lg="24" class="txt">关注</el-col></div>
-              <div class="fans"><el-col :xs="12" :sm="12" :md="24" :lg="24" class="num">{{postInfo.user_info.fans_num}}</el-col><el-col :xs="12" :sm="12" :md="24" :lg="24" class="txt">粉丝</el-col></div>
-              <div class="comment"><el-col :xs="12" :sm="12" :md="24" :lg="24" class="num">{{postInfo.user_info.comment_num}}</el-col><el-col :xs="12" :sm="12" :md="24" :lg="24" class="txt">评论</el-col></div>
-              <div class="collection"><el-col :xs="12" :sm="12" :md="24" :lg="24" class="num">{{postInfo.user_info.collection_num}}</el-col><el-col :xs="12" :sm="12" :md="24" :lg="24" class="txt">收藏</el-col></div>
+              <div class="attention">
+                <el-col :xs="12" :sm="12" :md="24" :lg="24" :xl="24" class="num">{{postInfo.user_info.attention_num}}</el-col>
+                <el-col :xs="12" :sm="12" :md="24" :lg="24" :xl="24" class="txt">关注</el-col>
+              </div>
+              <div class="fans">
+                <el-col :xs="12" :sm="12" :md="24" :lg="24" :xl="24" class="num">{{postInfo.user_info.fans_num}}</el-col>
+                <el-col :xs="12" :sm="12" :md="24" :lg="24" :xl="24" class="txt">粉丝</el-col>
+              </div>
+              <div class="comment">
+                <el-col :xs="12" :sm="12" :md="24" :lg="24" :xl="24" class="num">{{postInfo.user_info.comment_num}}</el-col>
+                <el-col :xs="12" :sm="12" :md="24" :lg="24" :xl="24" class="txt">评论</el-col>
+              </div>
+              <div class="collection">
+                <el-col :xs="12" :sm="12" :md="24" :lg="24" :xl="24" class="num">{{postInfo.user_info.collection_num}}</el-col>
+                <el-col :xs="12" :sm="12" :md="24" :lg="24" :xl="24" class="txt">收藏</el-col>
+              </div>
             </div>
             <div class="attention_author">
               <div v-if="postInfo.user_info.id==selfInfo.id"></div>
@@ -30,7 +45,7 @@
             </div>
           </div>
         </el-col>
-        <el-col :xs="24" :sm="24" :md="18" :lg="19">
+        <el-col :xs="24" :sm="24" :md="18" :lg="19" :xl="19">
           <div class="content_wrap">
             <div class="post_info">
               <div class="time">{{postInfo.time}}</div>
@@ -44,9 +59,7 @@
             <div class="title-box">
               <h1>{{postInfo.title}}</h1>
             </div>
-            <div class="content_views">
-              {{postInfo.content}}
-            </div>
+            <div class="content_views" v-html="postInfo.content"></div> <!-- 文章内容 -->
           </div>
           <div class="comment_wrap">
             <div class="title">评论区</div>
@@ -60,12 +73,12 @@
                   v-model="commentContent"
                   :placeholder="commentPlaceholder"
                   @keyup.native.enter="handleComment"
-                  @blur="handleCommentInputBlur"
+                  @click.native.stop="1"
                   >
                 </el-input>
               </div>
               <div class="submit_btn">
-                <el-button @click="handleComment">评论</el-button>
+                <el-button @click.stop.prevent="handleComment">评论</el-button>
               </div>
             </div>
             <div class="no-content" v-if="!commentInfo.length">暂无评论...</div>
@@ -81,7 +94,7 @@
                   <div class="comment_content">
                      {{item.content}}
                      <span class="time">{{item.time | fromNow}}</span>
-                     <span class="reply" @click="handleReply(item)">回复</span>
+                     <span class="reply" @click.stop.prevent="handleReply(item)">回复</span>
                   </div>
                 </div>
                 <div class="reply_list">
@@ -97,7 +110,7 @@
                       <div class="comment_content">
                         {{item1.content}}
                         <span class="time">{{item1.time | fromNow}}</span>
-                        <span class="reply" @click="handleReply(item1, item)">回复</span>
+                        <span class="reply" @click.stop.prevent="handleReply(item1, item)">回复</span>
                       </div>
                     </div>
                   </div>
@@ -136,7 +149,7 @@ export default {
       commentContent: '',
       commentPlaceholder: '请输入评论内容',
       // 是否为回复状态，false表示当前是评论帖子的状态
-      reply: false,
+      isReply: false,
       // 帖子信息
       postInfo: {user_info: {}},
       // 评论信息
@@ -146,7 +159,7 @@ export default {
       // 当前评论的页数
       currentPage: 1,
       commentRequestData: {
-        limit: 3,
+        limit: 10,
         currentPage: 1
       },
       selfInfo: {}
@@ -164,6 +177,12 @@ export default {
     this.setHistory()
   },
   methods: {
+    // 处理除了关键按钮的点击，用来让回复状态消失，变回原来的评论状态
+    handleWrapClick () {
+      this.commentPlaceholder = '请输入评论内容'
+      // 失焦则将状态恢复成默认状态 即评论状态
+      this.isReply = false
+    },
     // 获取帖子信息
     async getPostInfo () {
       let res = await fetchPostInfo({ id: this.$route.params.id, visit_id: this.selfInfo.id || 0 })
@@ -200,12 +219,12 @@ export default {
       if (!this.checkLogin()) return
       if (this.commentContent.trim() === '') {
         this.$message({
-          message: '请输入评论内容！',
+          message: '请输入评论内容',
           type: 'error'
         })
         return
       }
-      if (!reply) {
+      if (!this.isReply) {
         // 当前为评论状态
         await comment({
           user_id: this.selfInfo.id,
@@ -227,15 +246,9 @@ export default {
           type: 'success'
         })
       }
+      this.commentContent = ''
       // 重新获取评论列表，刷新评论列表
       this.getCommentInfo()
-    },
-
-    // 评论输入框失焦
-    handleCommentInputBlur () {
-      this.commentPlaceholder = '请输入评论内容'
-      // 失焦则将状态恢复成默认状态 即评论状态
-      this.reply = false
     },
 
     // 取消关注
@@ -263,9 +276,9 @@ export default {
       if (!this.checkLogin()) return
       this.commentPlaceholder = '回复@' + item.nickname || item.username
       // 使评论输入框聚焦
-      this.$refs.commentInput.focus()
+      if (!this.$refs.commentInput.focused) this.$refs.commentInput.focus()
       // 改变当前的状态为 回复状态
-      this.reply = true
+      this.isReply = true
       const data = {}
       data.passive_user_id = item.user_id
       // 如果存在评论的对象，则使用评论对象中的id，表示当前是点击回复内容后面 回复按钮进入的函数
@@ -330,6 +343,28 @@ export default {
     background: rgb(245,246,247);
     .main {
       padding-top: 12px;
+      position: relative;
+      .cover {
+        position: absolute;
+        left: 0;
+        top: 0;
+        width: 100%;
+        height: 100%;
+        z-index: 100;
+        display: flex;
+        justify-content: center;
+        img {
+          opacity: 0.2;
+          width: 200px;
+          object-fit: scale-down;
+          -webkit-touch-callout: none;
+          -webkit-user-select: none;
+          -khtml-user-select: none;
+          -moz-user-select: none;
+          -ms-user-select: none;
+          user-select: none;
+        }
+      }
       .author_info {
         background: #fff;
         border-radius: 12px;
@@ -482,7 +517,7 @@ export default {
         }
       }
       .comment_wrap {
-        margin-top: 12px;
+        margin: 12px 0 24px 0;
         background: #fff;
         padding: 25px;
         border-radius: 12px;

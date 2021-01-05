@@ -44,6 +44,7 @@ $height: 80px;
       left: 0;
       bottom: 0;
       border-top: 1px solid #f5f6f7;
+      z-index: 999;
       .inner {
         height: $height;
         display: flex;

@@ -3,7 +3,11 @@
       <com-header :index="1"></com-header>
       <div class="container_wrap my-container">
         <el-row :gutter="12">
-          <el-col class="main" :md="16" :lg="16">
+          <el-col class="main" :md="16" :lg="16" :xl="16">
+            <div class="cate_introduction">
+              <div class="title">{{cateInfo.name || '所有分类内容'}}</div>
+              <div class="desc">{{cateInfo.desc}}</div>
+            </div>
             <div class="recoomend_list">
               <div class="no_data" v-if="postList.length==0">暂无数据</div>
               <ul v-else>
@@ -13,7 +17,7 @@
                       <h2><router-link :to="`/post/${item.id}`" target="_blank">{{item.title}}</router-link></h2>
                     </div>
                     <div class="summary_content">
-                        {{item.content}}
+                        {{item.content | delTag}}
                       </div>
                     <div class="list_user_bar">
                       <router-link :to="`/uc/${item.user_id}`" target="_blank" class="user">
@@ -37,14 +41,14 @@
               </ul>
             </div>
           </el-col>
-          <el-col :md="8" :lg="8">
+          <el-col :md="8" :lg="8" :xl="8">
             <div class="cate_list_wrap">
               <div class="cate_title">
                 <span class="txt">分类列表</span>
               </div>
               <el-collapse accordion>
                 <el-collapse-item v-for="item in cateList" :key="item.id" :title="item.name" :name="item.id">
-                  <div v-for="item1 in item.sub_cate" :key="item1.id">
+                  <div v-for="item1 in item.sub_cate" :key="item1.id" class="cate_item">
                     <router-link :to="{path: '/cate', query: {sub_cate: item1.id}}">{{item1.name}}</router-link>
                   </div>
                 </el-collapse-item>
@@ -61,6 +65,7 @@
 import comHeader from '@/components/comHeader'
 import comFooter from '@/components/comFooter'
 import { fetchPost, fetchCategory } from '@/api/category'
+import { delHtmlTag } from '@/utils'
 
 export default {
   data () {
@@ -72,7 +77,13 @@ export default {
         skip: 0
       },
       hasMore: true,
-      hasShowMessage: false
+      hasShowMessage: false,
+      cateInfo: {}
+    }
+  },
+  filters: {
+    delTag (val) {
+      return delHtmlTag(val)
     }
   },
   mounted () {
@@ -99,14 +110,15 @@ export default {
         param.sub_cate = query.sub_cate
       }
       let res = await fetchPost(param)
-      if (res.data.length === 0) {
+      if (res.data.post.length === 0) {
         this.hasMore = false
         this.$message({
           message: '没有更多数据',
           type: 'success'
         })
       }
-      this.postList = [...this.postList, ...res.data]
+      this.postList = [...this.postList, ...res.data.post]
+      if (!this.cateInfo.length) this.cateInfo = res.data.cate
     },
 
     // 获取分类列表
@@ -159,8 +171,22 @@ export default {
     .container_wrap {
       padding: 12px 0;
       .main {
+        .cate_introduction {
+          background: #fff;
+          padding: 24px;
+          border-radius: 12px;
+          .title {
+            color: #20232C;
+            font-size: 18px;
+            font-weight: bold;
+          }
+          .desc {
+            padding-top: 12px;
+            color: #555666;
+          }
+        }
         .recoomend_list {
-          padding-bottom: 12px;
+          padding: 12px 0;
           ul {
             li {
               background: #fff;
@@ -296,6 +322,19 @@ export default {
         }
         .is-active {
           color: #409EFF;
+        }
+        .cate_item {
+          padding: 5px 0 5px 20px;
+          a {
+            display: inline-block;
+            width: 100%;
+            height: 100%;
+            color: #20232C;
+          }
+        }
+        .el-collapse-item__header {
+          font-size: 16px;
+          font-weight: bold;
         }
       }
     }
