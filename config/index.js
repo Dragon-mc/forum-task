@@ -50,7 +50,7 @@ module.exports = {
     // Paths
     assetsRoot: path.resolve(__dirname, '../dist'),
     assetsSubDirectory: 'static',
-    assetsPublicPath: '/php2/forum/',
+    assetsPublicPath: '/php2/',
 
     /**
      * Source Maps

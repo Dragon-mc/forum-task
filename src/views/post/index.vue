@@ -141,7 +141,29 @@ import { cancelAttention, attention, collection, calcelCollection, history } fro
 import { getUserInfo } from '@/utils'
 import comHeader from '@/components/comHeader'
 import comFooter from '@/components/comFooter'
+// 代码高亮的js
+const hljs = require('highlight.js')
+window.hljs = hljs
+// 样式文件
+import 'highlight.js/styles/atom-one-dark.css'
+// 行号插件
+require('highlightjs-line-numbers.js')
+window.hljs.initHighlightingOnLoad()
+window.hljs.initLineNumbersOnLoad({
+  singleLine: true
+})
 moment.locale('zh-ch')
+
+// 代码高亮渲染
+const highlightCode = () => {
+  const preEl = document.querySelectorAll('pre')
+  preEl.forEach(el => {
+    // language-markup为html代码，highlight无法解析，所以转换成language-html
+    el.className = el.className.replace('language-markup', 'language-html')
+    window.hljs.highlightBlock(el.firstElementChild)
+    window.hljs.lineNumbersBlock(el.firstElementChild)
+  })
+}
 
 export default {
   data () {
@@ -175,6 +197,12 @@ export default {
     this.getPostInfo()
     this.getCommentInfo()
     this.setHistory()
+    // 初始化页面时渲染代码高亮
+    highlightCode()
+  },
+  updated () {
+    // 页面刷新时也同时渲染代码高亮，保证代码一直是高亮状态
+    highlightCode()
   },
   methods: {
     // 处理除了关键按钮的点击，用来让回复状态消失，变回原来的评论状态
@@ -337,7 +365,7 @@ export default {
 }
 </script>
 
-<style lang="scss" scoped>
+<style lang="scss">
   .post_wrap {
     min-height: 100vh;
     background: rgb(245,246,247);
@@ -513,6 +541,42 @@ export default {
             font-weight: 600;
             margin: 0;
             word-break: break-all;
+          }
+        }
+        .content_views {
+          code {
+            border-radius: 5px;
+            /* 对于数字块 */
+            .hljs-ln-numbers {
+              -webkit-touch-callout: none;
+              -webkit-user-select: none;
+              -khtml-user-select: none;
+              -moz-user-select: none;
+              -ms-user-select: none;
+              user-select: none;
+              text-align: center;
+              color: #abb2bf;
+              border-right: 1px solid #CCC;
+              vertical-align: top;
+              padding-right: 5px;
+              /* 你的定制风格 */
+              text-align: right;
+              width: 40px;
+              font-size: 16px;
+              padding: 0 8px;
+              .hljs-ln-n::before {
+                font-size: 16px;
+              }
+            }
+            /* 对于代码块 */
+            .hljs-ln-code {
+              padding-left: 10px;
+            }
+            .hljs-ln-line {
+              height: 22px;
+              line-height: 22px;
+              font: 400 14px Source Code Pro,DejaVu Sans Mono,Ubuntu Mono,Anonymous Pro,Droid Sans Mono,Menlo,Monaco,Consolas,Inconsolata,Courier,monospace,PingFang SC,Microsoft YaHei,sans-serif!important;
+            }
           }
         }
       }

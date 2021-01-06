@@ -90,8 +90,11 @@
               <!-- 轮播图 -->
               <div class="carousel">
                 <el-carousel trigger="click" height="300px">
-                  <el-carousel-item v-for="item in 4" :key="item">
-                    <h3 class="small">{{ item }}</h3>
+                  <el-carousel-item v-for="item in CarouselList" :key="item.id">
+                    <router-link :to="`/post/${item.id}`">
+                      <img :src="item.content" :alt="item.title">
+                      <h3 class="title">{{item.title}}</h3>
+                    </router-link>
                   </el-carousel-item>
                 </el-carousel>
               </div>
@@ -210,11 +213,13 @@
 import comHeader from '@/components/comHeader'
 import comFooter from '@/components/comFooter'
 import { getUserInfo, delHtmlTag } from '@/utils'
-import { fetchRecommendPostList, fetchRankList, fetchCateList } from '@/api'
+import { fetchCarouselList, fetchRecommendPostList, fetchRankList, fetchCateList } from '@/api'
 
 export default {
   data () {
     return {
+      // 轮播图列表
+      CarouselList: [],
       recommendPostList: [],
       browseRank: [],
       commentRank: [],
@@ -234,6 +239,7 @@ export default {
   },
   mounted () {
     this.userInfo = getUserInfo()
+    this.getCarouselList()
     this.getRecommendPostList()
     this.getRankList()
     this.getCateList()
@@ -267,6 +273,18 @@ export default {
         skip: 0
       }
       this.hasMore = true
+    },
+    
+    // 获取轮播图展示的信息
+    async getCarouselList () {
+      let res = await fetchCarouselList()
+      let reg = /\bsrc\b\s*=\s*[\'\"]?([^\'\"]*)[\'\"]?/i
+      res.data.forEach((v, i) => {
+        // 将图片链接用正则表达式匹配出来
+        let src = v.content.match(reg)[1]
+        res.data[i].content = src
+      })
+      this.CarouselList = res.data
     },
 
     // 获取推荐帖子信息
@@ -378,18 +396,32 @@ export default {
       }
 
       .scroll_content {
-        // width: 1072px;
-        // float: left;
-
         .main {
-          // width: 760px;
-          // margin-right: 12px;
-          // float: left;
-
           .carousel {
             border-radius: 12px;
             overflow: hidden;
             margin-bottom: 12px;
+            border: 5px solid #fff;
+            position: relative;
+            .el-carousel {
+              img {
+                height: 100%;
+                width: 100%;
+                object-fit: cover;
+              }
+              .title {
+                position: absolute;
+                color: #fff;
+                padding: 0 20px;
+                left: 0;
+                bottom: 30px;
+                font-size: 16px;
+                width: 100%;
+                white-space: nowrap;
+                overflow: hidden;
+                text-overflow: ellipsis;
+              }
+            }
           }
 
           .recoomend_list {
@@ -655,20 +687,6 @@ export default {
     }
   }
 
-  .el-carousel__item h3 {
-    color: #475669;
-    font-size: 14px;
-    opacity: 0.75;
-    line-height: 150px;
-    margin: 0;
-  }
-
-  .el-carousel__item:nth-child(2n) {
-     background-color: #99a9bf;
-  }
-  .el-carousel__item:nth-child(2n+1) {
-     background-color: #d3dce6;
-  }
   @media screen and (max-width: 767px) {
     .responsive_img {
       height: 45px;

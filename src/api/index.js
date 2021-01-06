@@ -45,3 +45,11 @@ export function fetchAttentionRank (data) {
     data
   })
 }
+
+export function fetchCarouselList (data) {
+  return request({
+    url: '/front/index/fetchCarouselList',
+    method: 'post',
+    data
+  })
+}

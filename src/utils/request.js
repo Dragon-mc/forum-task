@@ -5,7 +5,7 @@ import { Message } from 'element-ui'
 // 创建axios实例
 const http = axios.create({
   baseURL: process.env.VUE_APP_BASE_API,
-  timeout: 5000, // request timeout
+  timeout: 10000, // request timeout
   headers: {
     'content-type': 'application/x-www-form-urlencoded'
   }
