@@ -41,7 +41,7 @@ export default {
     }
   },
   mounted () {
-    this.visit_id = getUserInfo().id
+    this.visit_id = getUserInfo().id || 0
     this.getAttentionRankList()
     this.scrollFunction = this.scroll.bind(this)
     document.addEventListener('scroll', this.scrollFunction)
@@ -70,6 +70,7 @@ export default {
           message: '请登录后操作',
           type: 'error'
         })
+        return
       }
       let message = ''
       if (item.is_attention) {
